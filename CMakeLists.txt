@@ -89,8 +89,8 @@ add_executable(deformable
   common/shader.cpp
   common/shader.h
 
-  src/simple.fragmentshader
-  src/simple.vertexshader
+  src/deformable.vert
+  src/deformable.frag
 )
 target_link_libraries(deformable
   ${ALL_LIBS}
@@ -108,7 +108,7 @@ create_default_target_launcher(deformable WORKING_DIRECTORY "${CMAKE_CURRENT_SOU
 ###############################################################################
 
 SOURCE_GROUP(common REGULAR_EXPRESSION ".*/common/.*" )
-SOURCE_GROUP(shaders REGULAR_EXPRESSION ".*/.*shader$" )
+SOURCE_GROUP(shaders REGULAR_EXPRESSION "(vert|frag|geom)" )
 SOURCE_GROUP(obj REGULAR_EXPRESSION ".*/.*obj$" )
 
 ###############################################################################
@@ -117,8 +117,27 @@ if (NOT ${CMAKE_GENERATOR} MATCHES "Xcode" )
 
   add_custom_command(
     TARGET deformable POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/deformable${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/src/"
-    )
+    COMMAND ${CMAKE_COMMAND} -E copy 
+            ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/deformable${CMAKE_EXECUTABLE_SUFFIX} 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+
+  add_custom_command(
+    TARGET deformable POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/src/*.vert
+            ${CMAKE_CURRENT_BINARY_DIR})
+
+  add_custom_command(
+    TARGET deformable POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/src/*.frag
+            ${CMAKE_CURRENT_BINARY_DIR})
+
+  add_custom_command(
+    TARGET deformable POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/src/*.geom
+            ${CMAKE_CURRENT_BINARY_DIR})
 
 elseif (${CMAKE_GENERATOR} MATCHES "Xcode" )
 
