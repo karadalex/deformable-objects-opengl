@@ -1,10 +1,12 @@
 #version 330 core
 
-// task define input variable from vertex shader
+// input data
+in vec3 color;
 
-// task define output variable of the fragment color
+// output data
+out vec3 fragmentColor;
 
 void main()
 {
-    // task assign color to fragment output variable 
+    fragmentColor = color;
 }
