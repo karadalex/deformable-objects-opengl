@@ -33,7 +33,7 @@ GLuint verticesVBO, colorsVBO;
 
 void createContext() {
     // Create and compile our GLSL program from the shaders
-    shaderProgram = loadShaders("simple.vertexshader", "simple.fragmentshader");
+    shaderProgram = loadShaders("deformable.vert", "deformable.frag", "deformable.geom");
 
     // task define VAO
 
