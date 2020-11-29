@@ -38,8 +38,8 @@ Cube *cube1, *cube2;
 
 
 void createContext() {
-    cube1 = new Cube();
-    cube2 = new Cube(vec3(4, 0, 0));
+    cube1 = new Cube(vec3(-4,0,0), 40);
+    cube2 = new Cube(vec3(4, 0, 0), 10);
     cube1->createContext();
     cube2->createContext();
 

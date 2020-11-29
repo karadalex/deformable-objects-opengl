@@ -17,13 +17,16 @@ class Cube
 {
 public:
     GLuint cubeVAO;
-    GLuint cubeVerticiesVBO, cubeColorsVBO;
+    GLuint cubeVerticesVBO, cubeColorsVBO;
     GLuint MVPLocation;
     GLuint shaderProgram;
     GLfloat previousTime, dt;
     vec3 position;
+    int density;
 
-    Cube(vec3 position = vec3(0, 0, 0));
+    vector<GLfloat> cubeVertices;
+
+    Cube(vec3 position = vec3(0, 0, 0), int density = 1);
 
     void createContext();
     void draw();
