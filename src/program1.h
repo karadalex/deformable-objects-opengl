@@ -18,6 +18,7 @@
 #include <common/util.h>
 
 #include "cube.h"
+#include "plane.h"
 #include "staircase.h"
 
 namespace program1 {
@@ -38,12 +39,16 @@ void free();
 // Global variables
 GLFWwindow* window;
 Cube *cube;
+Plane* plane;
 Staircase *staircase;
 
 
 void createContext() {
     cube = new Cube(vec3(0,0,0), 10);
     cube->createContext();
+
+    plane = new Plane();
+    plane->createContext();
 
     staircase = new Staircase(10, vec3(0,0,0));
     staircase->createContext();
@@ -55,6 +60,7 @@ void createContext() {
 void free() {
     delete cube;
     delete staircase;
+    delete plane;
 
     glfwTerminate();
 }
@@ -68,6 +74,7 @@ void mainLoop() {
 
         cube->draw();
         staircase->draw();
+        plane->draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

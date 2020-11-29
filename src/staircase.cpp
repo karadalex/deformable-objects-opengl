@@ -21,28 +21,28 @@ void Staircase::createContext()
     // Define staircase vertices. Three consecutive floats give a 3D vertex; Three
     // consecutive vertices give a triangle.
     GLfloat width = 2;
-    GLfloat xzdim = 0.5;
+    GLfloat xydim = 0.5;
     GLfloat x, y, z;
     x = y = z = 0.0f;
     for (int n = 0; n < stairs; n++) {
-        x = n*xzdim;
-        z = n*xzdim;
+        x = n*xydim;
+        y = n*xydim;
 
         staircaseVertices.push_back(x); staircaseVertices.push_back(y); staircaseVertices.push_back(z);
-        staircaseVertices.push_back(x); staircaseVertices.push_back(y+width); staircaseVertices.push_back(z);
-        staircaseVertices.push_back(x); staircaseVertices.push_back(y); staircaseVertices.push_back(z+xzdim);
+        staircaseVertices.push_back(x); staircaseVertices.push_back(y); staircaseVertices.push_back(z+width);
+        staircaseVertices.push_back(x); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z);
 
-        staircaseVertices.push_back(x); staircaseVertices.push_back(y); staircaseVertices.push_back(z+xzdim);
-        staircaseVertices.push_back(x); staircaseVertices.push_back(y+width); staircaseVertices.push_back(z);
-        staircaseVertices.push_back(x); staircaseVertices.push_back(y+width); staircaseVertices.push_back(z+xzdim);
+        staircaseVertices.push_back(x); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z);
+        staircaseVertices.push_back(x); staircaseVertices.push_back(y); staircaseVertices.push_back(z+width);
+        staircaseVertices.push_back(x); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z+width);
 
-        staircaseVertices.push_back(x); staircaseVertices.push_back(y); staircaseVertices.push_back(z+xzdim);
-        staircaseVertices.push_back(x); staircaseVertices.push_back(y+width); staircaseVertices.push_back(z+xzdim);
-        staircaseVertices.push_back(x+xzdim); staircaseVertices.push_back(y); staircaseVertices.push_back(z+xzdim);
+        staircaseVertices.push_back(x); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z);
+        staircaseVertices.push_back(x); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z+width);
+        staircaseVertices.push_back(x+xydim); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z);
 
-        staircaseVertices.push_back(x+xzdim); staircaseVertices.push_back(y); staircaseVertices.push_back(z+xzdim);
-        staircaseVertices.push_back(x+xzdim); staircaseVertices.push_back(y+width); staircaseVertices.push_back(z+xzdim);
-        staircaseVertices.push_back(x); staircaseVertices.push_back(y+width); staircaseVertices.push_back(z+xzdim);
+        staircaseVertices.push_back(x+xydim); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z);
+        staircaseVertices.push_back(x+xydim); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z+width);
+        staircaseVertices.push_back(x); staircaseVertices.push_back(y+xydim); staircaseVertices.push_back(z+width);
     }
     
 
@@ -54,23 +54,11 @@ void Staircase::createContext()
 
     // color VBO
     vector<GLfloat> staircaseColors;
-    vector<GLfloat> faceColors = {
-        0.1f, 0.1f, 0.1f,
-        0.1f, 0.1f, 0.1f,
-        0.1f, 0.1f, 0.1f,
-
-        0.1f, 0.1f, 0.1f,
-        0.1f, 0.1f, 0.1f,
-        0.1f, 0.1f, 0.1f,
-
-        0.2f, 0.2f, 0.2f,
-        0.2f, 0.2f, 0.2f,
-        0.2f, 0.2f, 0.2f,
-
-        0.2f, 0.2f, 0.2f,
-        0.2f, 0.2f, 0.2f,
-        0.2f, 0.2f, 0.2f,
-    };
+    vector<GLfloat> faceColors;
+    for (int i = 0; i < 18; i++)
+      faceColors.push_back(0.1f);
+    for (int i = 0; i < 18; i++)
+      faceColors.push_back(0.2f);
     for (int n = 0; n < stairs; n++) {
         staircaseColors.insert(staircaseColors.end(), faceColors.begin(), faceColors.end());
     }
