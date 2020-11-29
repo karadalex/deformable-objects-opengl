@@ -21,8 +21,9 @@ public:
     GLuint MVPLocation;
     GLuint shaderProgram;
     GLfloat previousTime, dt;
+    vec3 position;
 
-    Cube();
+    Cube(vec3 position = vec3(0, 0, 0));
 
     void createContext();
     void draw();

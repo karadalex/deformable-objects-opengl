@@ -1,7 +1,7 @@
 #include "cube.h"
 
 
-Cube::Cube() {
+Cube::Cube(vec3 position) : position(position) {
   previousTime = glfwGetTime();
   // Create and compile our GLSL program from the shaders
   shaderProgram = loadShaders("deformable.vert",
@@ -119,7 +119,7 @@ void Cube::draw() {
   mat4 cubeScaling = glm::scale(mat4(), vec3(1.0, 1.0, 1.0));
   mat4 cubeRotation = glm::rotate(mat4(), 3.14f / 4, vec3(0, 1, 0));
   cubeRotation = cubeRotation * glm::rotate(mat4(), 3.14f / 4, vec3(0, 0, 1));
-  mat4 cubeTranslation = glm::translate(mat4(), vec3(1.0, 0.0, 0.0));
+  mat4 cubeTranslation = glm::translate(mat4(), position);
 
   // Projection matrix: 45deg Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
   mat4 projection = perspective(radians(45.f), 4.0f / 3.0f, 0.1f, 100.0f);

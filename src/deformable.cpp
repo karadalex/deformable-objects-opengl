@@ -34,19 +34,22 @@ void free();
 
 // Global variables
 GLFWwindow* window;
-Cube* cube;
+Cube *cube1, *cube2;
 
 
 void createContext() {
-    cube = new Cube();
-    cube->createContext();
+    cube1 = new Cube();
+    cube2 = new Cube(vec3(4, 0, 0));
+    cube1->createContext();
+    cube2->createContext();
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 
 void free() {
-    delete cube;
+    delete cube1;
+    delete cube2;
 
     glfwTerminate();
 }
@@ -58,7 +61,8 @@ void mainLoop() {
         // Clear the screen (color and depth)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cube->draw();
+        cube1->draw();
+        cube2->draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
