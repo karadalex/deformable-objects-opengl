@@ -88,6 +88,12 @@ add_executable(deformable
   src/staircase.cpp
   src/staircase.h
 
+  src/program1.h
+  src/program2.h
+  src/program3.h
+  src/program4.h
+  src/program5.h
+
   common/util.cpp
   common/util.h
   common/shader.cpp

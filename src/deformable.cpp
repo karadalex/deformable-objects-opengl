@@ -1,138 +1,40 @@
-// Include C++ headers
 #include <iostream>
-#include <string>
+#include <stdio.h>
 
-// Include GLEW
-#include <GL/glew.h>
-
-// Include GLFW
-#include <glfw3.h>
-
-// Include GLM
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>   // glm::to_string
-
-// Shader loading utilities and other
-#include <common/shader.h>
-#include <common/util.h>
-
-#include "cube.h"
-#include "staircase.h"
+#include "program1.h"
+#include "program2.h"
+#include "program3.h"
+#include "program4.h"
+#include "program5.h"
 
 using namespace std;
-using namespace glm;
 
-// Function prototypes
-void initialize();
-void createContext();
-void mainLoop();
-void free();
+int main(int argc, char* argv[]) {
+    cout << "Deformable objects simulation with OpenGL" << endl;
+	cout << "by Alexios Karadimos, up1046820@upnet.gr, karadalex@gmail.com" << endl << endl;
+	cout << "Choose program: " << endl;
+    cout << "1. Deformable cube" << endl;
+    cout << "2. Deformable cube and staircase experiment" << endl;
+    cout << "3. Configure deformable object" << endl;
+    cout << "4. Deformable cube - User interaction" << endl;
+    cout << "5. Free-form deformation of objects" << endl;
 
-#define W_WIDTH 1024
-#define W_HEIGHT 768
-#define TITLE "Deformable"
+	int programChoice;
+	cin >> programChoice;
 
-// Global variables
-GLFWwindow* window;
-Cube *cube;
-Staircase *staircase;
-
-
-void createContext() {
-    cube = new Cube(vec3(0,0,0), 10);
-    cube->createContext();
-
-    staircase = new Staircase(10, vec3(0,0,0));
-    staircase->createContext();
-
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-}
-
-
-void free() {
-    delete cube;
-    delete staircase;
-
-    glfwTerminate();
-}
-
-
-void mainLoop() {
-    do {
-        // Depth test  | GL_DEPTH_BUFFER_BIT
-        // Clear the screen (color and depth)
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        cube->draw();
-        staircase->draw();
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
-             glfwWindowShouldClose(window) == 0);
-}
-
-
-void initialize() {
-    // Initialize GLFW
-    if (!glfwInit()) {
-        throw runtime_error("Failed to initialize GLFW\n");
-    }
-
-    glfwWindowHint(GLFW_SAMPLES, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    // Open a window and create its OpenGL context
-    window = glfwCreateWindow(W_WIDTH, W_HEIGHT, TITLE, NULL, NULL);
-    if (window == NULL) {
-        glfwTerminate();
-        throw runtime_error(string(string("Failed to open GLFW window.") +
-                            " If you have an Intel GPU, they are not 3.3 compatible." +
-                            "Try the 2.1 version.\n"));
-    }
-    glfwMakeContextCurrent(window);
-
-    // Start GLEW extension handler
-    glewExperimental = GL_TRUE;
-
-    // Initialize GLEW
-    if (glewInit() != GLEW_OK) {
-        glfwTerminate();
-        throw runtime_error("Failed to initialize GLEW\n");
-    }
-
-    // Ensure we can capture the escape key being pressed below
-    glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-
-    // Gray background color
-    glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
-
-    // Task 12: Enable depth test
-    glEnable(GL_DEPTH_TEST);
-    // Accept fragment if it closer to the camera than the former one
-    glDepthFunc(GL_LESS);
-
-    // Log
-    logGLParameters();
-}
-
-
-int main(void) {
-    try {
-        initialize();
-        createContext();
-        mainLoop();
-        free();
-    } catch (exception& ex) {
-        cout << ex.what() << endl;
-        getchar();
-        free();
-        return -1;
-    }
-
-    return 0;
+	switch (programChoice)
+	{
+	case 1:
+        return program1::main(argc, argv);
+	case 2:
+        return program2::main(argc, argv);
+	case 3:
+        return program3::main(argc, argv);
+    case 4:
+        return program4::main(argc, argv);
+    case 5:
+        return program5::main(argc, argv);
+	default:
+		break;
+	}
 }
