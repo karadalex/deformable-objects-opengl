@@ -2,10 +2,10 @@
 #include <iostream>
 #include <string>
 
-// Include GLEW (always include first)
+// Include GLEW
 #include <GL/glew.h>
 
-// Include GLFW to handle window and keyboard events
+// Include GLFW
 #include <glfw3.h>
 
 // Include GLM
@@ -25,31 +25,35 @@ void initialize();
 void createContext();
 void mainLoop();
 void free();
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
 #define W_WIDTH 1024
 #define W_HEIGHT 768
-#define TITLE "Deformable"
+#define TITLE "Lab 02"
 
 // Global variables
 GLFWwindow* window;
 GLuint shaderProgram;
 GLuint MVPLocation;
-GLuint cubeVAO, cubeVBO, cubeColorsVBO;
+GLuint cubeVAO;
+GLuint cubeVerticiesVBO, cubeColorsVBO;
+
 
 void createContext() {
     // Create and compile our GLSL program from the shaders
-    shaderProgram = loadShaders("deformable.vert", "deformable.frag");
+    shaderProgram = loadShaders("deformable.vert",
+                                "deformable.frag");
 
     // Get a pointer location to model matrix in the vertex shader
     MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
 
-    // Define triangle VAO
+    // Define cube VAO
     glGenVertexArrays(1, &cubeVAO);
     glBindVertexArray(cubeVAO);
 
-    // Define vertex VBO
-    static vector<GLfloat> cubeVertices = {
+    // Define cube vertices. Three consecutive floats give a 3D vertex; Three
+    // consecutive vertices give a triangle. A cube has 6 faces with 2
+    // triangles each, so this makes 6*2=12 triangles, and 12*3 vertices
+    vector<GLfloat> cubeVertices = {
         -1.0f,-1.0f,-1.0f, // triangle 1 : begin
         -1.0f,-1.0f, 1.0f,
         -1.0f, 1.0f, 1.0f, // triangle 1 : end
@@ -87,16 +91,14 @@ void createContext() {
         -1.0f, 1.0f, 1.0f,
         1.0f,-1.0f, 1.0f
     };
-    // TODO: Create cube vertices dynamically (Each face will have N^2 triangles)
-
-    glGenBuffers(1, &cubeVBO);
-    glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+    glGenBuffers(1, &cubeVerticiesVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, cubeVerticiesVBO);
     glBufferData(GL_ARRAY_BUFFER, cubeVertices.size()*sizeof(GLfloat), static_cast<void*>(cubeVertices.data()), GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(0);
 
     // color VBO
-    static vector<GLfloat> cubeColors = {
+    vector<GLfloat> cubeColors = {
         0.583f,  0.771f,  0.014f,
         0.609f,  0.115f,  0.436f,
         0.327f,  0.483f,  0.844f,
@@ -141,78 +143,44 @@ void createContext() {
     glEnableVertexAttribArray(1);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    // Draw wire frame triangles or fill: GL_LINE, or GL_FILL
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    // enable point size
-    glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
+
 void free() {
-    // Free allocated buffers
-    glDeleteBuffers(1, &cubeVBO);
+    glDeleteBuffers(1, &cubeVerticiesVBO);
     glDeleteBuffers(1, &cubeColorsVBO);
     glDeleteVertexArrays(1, &cubeVAO);
     glDeleteProgram(shaderProgram);
 
-    // Close OpenGL window and terminate GLFW
     glfwTerminate();
 }
 
+
 void mainLoop() {
-    // Task 4: transformation
-    GLfloat matrix[] = {
-        1.0f, 0.0f, 0.0f, 0.0f, // first column
-        0.0f, 1.0f, 0.0f, 0.0f, // second column
-        0.0f, 0.0f, 1.0f, 0.0f, // third column
-        0.0f, 0.0f, 0.0f, 1.0f	// fourth column
-    };
 
-    // Task 6: triangle scale
-    mat4 triangleScaling = glm::scale(mat4(), vec3(0.5, 0.5, 0.5));
-    // cout << glm::to_string(triangleScaling) << endl;
-
-    // Task 7: triangle rotate
-    mat4 triangleRotation = glm::rotate(mat4(), 3.14f / 4, vec3(0, 0, 1));
-    // cout << glm::to_string(triangleRotation) << endl;
-
-    // Task 8: triangle translate
-    mat4 triangleTranslation = glm::translate(mat4(), vec3(0.0, 1.5, 1.0));
-    cout << glm::to_string(triangleTranslation) << endl;
-
-    // Task 10: cube model matrix
+    // Cube model matrix
     mat4 cubeScaling = glm::scale(mat4(), vec3(1.0, 1.0, 1.0));
     mat4 cubeRotation = glm::rotate(mat4(), 3.14f / 4, vec3(0, 1, 0));
     cubeRotation = cubeRotation * glm::rotate(mat4(), 3.14f / 4, vec3(0, 0, 1));
     mat4 cubeTranslation = glm::translate(mat4(), vec3(1.0, 0.0, 0.0));
 
-    // Task 13: projection
-    // Projection matrix: 45� Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
+    // Projection matrix: 45deg Field of View, 4:3 ratio, display range : 0.1 unit <-> 100 units
     mat4 projection = perspective(radians(45.f), 4.0f / 3.0f, 0.1f, 100.0f);
-    // Or, for an ortho camera: -x:x, -y:y, -z:z
-    // mat4 Projection = ortho(
-
-    // Task 14: view
-    // Camera view matrix
-    // mat4 view = lookAt(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0));
 
     GLfloat previousTime = glfwGetTime();
 
     do {
-        // Task 12: depth test  | GL_DEPTH_BUFFER_BIT
+        // Depth test  | GL_DEPTH_BUFFER_BIT
         // Clear the screen (color and depth)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(shaderProgram);
 
-        // MVP matrix
+        // Task 9: triangle MVP matrix
         // compute model, view projection operator
-        // mat4 triangleModel = triangleTranslation * triangleRotation * triangleScaling; // Normal triangle
         GLfloat dt = glfwGetTime() - previousTime;
         previousTime = glfwGetTime();
-         cubeRotation = cubeRotation * glm::rotate(mat4(), dt, vec3(0.5, 0.5, 0.8)); // Rotate with speed = 3cycles/sec
-        // GLfloat scaleFactor = sin(glfwGetTime()) + 1; // Add a constant offset so that sin is positive
+        cubeRotation = cubeRotation * glm::rotate(mat4(), 3.14f * dt, vec3(0.5, 0.5, 0.8));
         cubeScaling = glm::scale(mat4(), vec3(1.0, 1.0, 1.0));
         // Rotate camera
         mat4 view = lookAt(
@@ -236,17 +204,18 @@ void mainLoop() {
              glfwWindowShouldClose(window) == 0);
 }
 
+
 void initialize() {
     // Initialize GLFW
     if (!glfwInit()) {
         throw runtime_error("Failed to initialize GLFW\n");
     }
 
-    glfwWindowHint(GLFW_SAMPLES, 4);  // 4x antialiasing
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // We want OpenGL 3.3
+    glfwWindowHint(GLFW_SAMPLES, 4);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // We don't want the old OpenGL
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
     // Open a window and create its OpenGL context
     window = glfwCreateWindow(W_WIDTH, W_HEIGHT, TITLE, NULL, NULL);
@@ -257,9 +226,6 @@ void initialize() {
                             "Try the 2.1 version.\n"));
     }
     glfwMakeContextCurrent(window);
-
-    // Set Handler function for resizing the window
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     // Start GLEW extension handler
     glewExperimental = GL_TRUE;
@@ -273,12 +239,18 @@ void initialize() {
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-    // Set background color (gray) [r, g, b, a]
+    // Gray background color
     glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
+
+    // Task 12: Enable depth test
+     glEnable(GL_DEPTH_TEST);
+    // Accept fragment if it closer to the camera than the former one
+     glDepthFunc(GL_LESS);
 
     // Log
     logGLParameters();
 }
+
 
 int main(void) {
     try {
@@ -294,13 +266,4 @@ int main(void) {
     }
 
     return 0;
-}
-
-
-// glfw: whenever the window size changed this callback function executes
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and 
-    // height will be significantly larger than specified on retina displays.
-    glViewport(0, 0, width, height);
 }
