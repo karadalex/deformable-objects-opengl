@@ -18,6 +18,7 @@
 #include <common/util.h>
 
 #include "cube.h"
+#include "staircase.h"
 
 using namespace std;
 using namespace glm;
@@ -34,22 +35,24 @@ void free();
 
 // Global variables
 GLFWwindow* window;
-Cube *cube1, *cube2;
+Cube *cube;
+Staircase *staircase;
 
 
 void createContext() {
-    cube1 = new Cube(vec3(-4,0,0), 40);
-    cube2 = new Cube(vec3(4, 0, 0), 10);
-    cube1->createContext();
-    cube2->createContext();
+    cube = new Cube(vec3(0,0,0), 10);
+    cube->createContext();
+
+    staircase = new Staircase(10, vec3(0,0,0));
+    staircase->createContext();
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 
 void free() {
-    delete cube1;
-    delete cube2;
+    delete cube;
+    delete staircase;
 
     glfwTerminate();
 }
@@ -61,8 +64,8 @@ void mainLoop() {
         // Clear the screen (color and depth)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cube1->draw();
-        cube2->draw();
+        cube->draw();
+        staircase->draw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

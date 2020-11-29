@@ -85,6 +85,8 @@ add_executable(deformable
   src/deformable.cpp
   src/cube.cpp
   src/cube.h
+  src/staircase.cpp
+  src/staircase.h
 
   common/util.cpp
   common/util.h
