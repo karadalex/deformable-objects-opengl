@@ -83,6 +83,8 @@ add_definitions(
 # deformable
 add_executable(deformable
   src/deformable.cpp
+  src/cube.cpp
+  src/cube.h
 
   common/util.cpp
   common/util.h
