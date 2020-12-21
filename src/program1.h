@@ -19,7 +19,6 @@
 
 #include "cube.h"
 #include "plane.h"
-#include "staircase.h"
 
 namespace program1 {
 
@@ -40,7 +39,6 @@ void free();
 GLFWwindow* window;
 Cube *cube;
 Plane* plane;
-Staircase *staircase;
 
 
 void createContext() {
@@ -50,16 +48,12 @@ void createContext() {
     plane = new Plane();
     plane->createContext();
 
-    staircase = new Staircase(10, vec3(0,0,0));
-    staircase->createContext();
-
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
 
 void free() {
     delete cube;
-    delete staircase;
     delete plane;
 
     glfwTerminate();
@@ -73,7 +67,6 @@ void mainLoop() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         cube->draw();
-        staircase->draw();
         plane->draw();
 
         glfwSwapBuffers(window);
