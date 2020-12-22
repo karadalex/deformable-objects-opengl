@@ -34,52 +34,29 @@ bool checkForPlaneSphereCollision(vec3& pos, const float& r, const float& size, 
     return true;
 }
 
-void handleBoxSphereCollision(Box& box, Sphere& sphere) {
+void handlePlaneCubeCollision(Plane& plane, Cube& cube) {
     vec3 n;
-    if (checkForBoxSphereCollision(sphere.x, sphere.r, box.size, n)) {
-        // Task 2b: define the velocity of the sphere after the collision
-		sphere.v = sphere.v -2.0f * dot(sphere.v, n) * n;
-		sphere.P = sphere.v * sphere.m;
+    if (checkForPlaneCubeCollision(cube.x, cube.l, plane.size, n)) {
+        // Define the velocity of the cube after the collision
+		cube.v = cube.v -2.0f * dot(cube.v, n) * n;
+		cube.P = cube.v * cube.m;
     }
 }
 
-bool checkForBoxSphereCollision(vec3& pos, const float& r, const float& size, vec3& n) {
-    if (pos.x - r <= 0) {
-        //correction
-        float dis = -(pos.x - r);
-        pos = pos + vec3(dis, 0, 0);
-
-        n = vec3(-1, 0, 0);
-    } else if (pos.x + r >= size) {
-        //correction
-        float dis = size - (pos.x + r);
-        pos = pos + vec3(dis, 0, 0);
-
-        n = vec3(1, 0, 0);
-    } else if (pos.y - r <= 0) {
+bool checkForPlaneCubeCollision(vec3& pos, const float& r, const float& size, vec3& n) {
+    bool insideXZ = true; // TODO: Check if cube is inside XZ plane
+    if (pos.y - r <= 0 && insideXZ) {
         //correction
         float dis = -(pos.y - r);
         pos = pos + vec3(0, dis, 0);
 
         n = vec3(0, -1, 0);
-    } else if (pos.y + r >= size) {
+    } else if (pos.y + r >= size && insideXZ) {
         //correction
         float dis = size - (pos.y + r);
         pos = pos + vec3(0, dis, 0);
 
         n = vec3(0, 1, 0);
-    } else if (pos.z - r <= 0) {
-        //correction
-        float dis = -(pos.z - r);
-        pos = pos + vec3(0, 0, dis);
-
-        n = vec3(0, 0, -1);
-    } else if (pos.z + r >= size) {
-        //correction
-        float dis = size - (pos.z + r);
-        pos = pos + vec3(0, 0, dis);
-
-        n = vec3(0, 0, 1);
     } else {
         return false;
     }

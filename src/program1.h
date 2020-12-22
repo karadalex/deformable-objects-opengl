@@ -19,7 +19,6 @@
 
 // #include "Cube.h"
 #include "Sphere.h"
-#include "Box.h"
 #include "MassSpringDamper.h"
 #include "Collision.h"
 #include "Plane.h"
@@ -47,7 +46,6 @@ GLuint shaderProgram;
 GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
 
 // Scene objects
-Sphere* sphere1;
 Plane* plane;
 Cube* cube;
 
@@ -62,12 +60,10 @@ void createContext() {
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
     plane = new Plane(8);
-    sphere1 = new Sphere(vec3(4, 4, 4), vec3(0, -1, 0), 0.4, 10);
-    cube = new Cube(vec3(4, 5, 4), vec3(0, 0, 0), vec3(1, 0, 1), 0.5, 1);
+    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 2, 10);
 }
 
 void free() {
-    delete sphere1;
     delete plane;
     delete cube;
     glDeleteProgram(shaderProgram);
@@ -79,12 +75,13 @@ void mainLoop() {
     vec3 lightPos = vec3(10, 10, 10);
     camera->position = glm::vec3(8, 8, 20);
     float maxEnergy = 0;
+
     do {
         // calculate dt
         float currentTime = glfwGetTime();
         float dt = currentTime - t;
 
-        // Task 2e: change dt to 0.001f and observe the total energy, then change
+        // Change dt to 0.001f and observe the total energy, then change
         // the numerical integration method to Runge - Kutta 4th order (in RigidBody.cpp)
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -101,33 +98,28 @@ void mainLoop() {
         plane->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
+        
+        handlePlaneCubeCollision(*plane, *cube);
 
+        // Task 2c: model the force due to gravity
+        cube->forcing = [&](float t, const vector<float>& y)->vector<float> {
+            vector<float> f(6, 0.0f);
+            f[1] = -cube->m * g;
+            return f;
+        };
         cube->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
         cube->draw();
-        
-        handlePlaneSphereCollision(*plane, *sphere1);
-
-        // Task 2c: model the force due to gravity
-        sphere1->forcing = [&](float t, const vector<float>& y)->vector<float> {
-            vector<float> f(6, 0.0f);
-            f[1] = -sphere1->m * g;
-			// f[1] = 0;
-            return f;
-        };
-        sphere1->update(t, dt);
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &sphere1->modelMatrix[0][0]);
-        sphere1->draw();
 
 
         // Calculate the total energy and comment on the previous
-        float KE = sphere1->calcKinecticEnergy();
-		float PE = sphere1->m * g * sphere1->x.y;
-        float T = KE + PE;
-        if (T > maxEnergy) {
-            cout << "Total Energy: " << T << endl;
-            maxEnergy = T;
-        }
+        // float KE = cube->calcKinecticEnergy();
+		// float PE = cube->m * g * cube->x.y;
+        // float T = KE + PE;
+        // if (T > maxEnergy) {
+        //     cout << "Total Energy: " << T << endl;
+        //     maxEnergy = T;
+        // }
 
         t += dt;
 
