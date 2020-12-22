@@ -20,6 +20,9 @@ public:
     float mouseSpeed;
     float fovSpeed;
 
+    double prevXPos, prevYPos;
+    int framesCursorInSamePos;
+
     Camera(GLFWwindow* window);
     void update();
 };
