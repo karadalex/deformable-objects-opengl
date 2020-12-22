@@ -75,3 +75,15 @@ bool checkForSphereSphereCollision(vec3& pos1, float& r1, vec3& pos2, float& r2,
 		return false;
     }   
 }
+
+
+// TODO
+void handleStaircaseCubeCollision(Staircase& plane, Cube& cube) {
+
+}
+
+
+// TODO
+bool checkForStaircaseCubeCollision(Staircase& plane, Cube& cube, glm::vec3& n) {
+
+}

@@ -4,6 +4,7 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "Cube.h"
+#include "Staircase.h"
 #include <glm/glm.hpp>
 
 class Box;
@@ -17,5 +18,8 @@ bool checkForPlaneCubeCollision(glm::vec3& pos, const float& r, const float& siz
 
 void handleSphereSphereCollision(Sphere& sphere1, Sphere& sphere2);
 bool checkForSphereSphereCollision(glm::vec3& pos1, float& r1, glm::vec3& pos2, float& r2, glm::vec3& n);
+
+void handleStaircaseCubeCollision(Staircase& plane, Cube& cube);
+bool checkForStaircaseCubeCollision(Staircase& plane, Cube& cube, glm::vec3& n);
 
 #endif
