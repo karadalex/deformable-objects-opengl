@@ -90,6 +90,19 @@ add_executable(deformable
   src/plane.cpp
   src/plane.h
 
+  src/RigidBody.cpp
+  src/RigidBody.h
+  # src/Cube.cpp
+  # src/Cube.h
+  src/Sphere.cpp
+  src/Sphere.h
+  src/Box.cpp
+  src/Box.h
+  src/MassSpringDamper.cpp
+  src/MassSpringDamper.h
+  src/Collision.cpp
+  src/Collision.h
+
   src/program1.h
   src/program2.h
   src/program3.h
@@ -100,10 +113,17 @@ add_executable(deformable
   common/util.h
   common/shader.cpp
   common/shader.h
+  common/camera.cpp
+  common/camera.h
+  common/model.cpp
+  common/model.h
+  common/texture.cpp
+  common/texture.h
 
   src/shaders/deformable.vert
   src/shaders/deformable.frag
   src/shaders/deformable.geom
+  src/shaders/main.vert
 )
 target_link_libraries(deformable
   ${ALL_LIBS}

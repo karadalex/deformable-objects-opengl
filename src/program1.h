@@ -11,14 +11,17 @@
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>   // glm::to_string
 
 // Shader loading utilities and other
 #include <common/shader.h>
 #include <common/util.h>
+#include <common/camera.h>
 
-#include "cube.h"
-#include "plane.h"
+// #include "Cube.h"
+#include "Sphere.h"
+#include "Box.h"
+#include "MassSpringDamper.h"
+#include "Collision.h"
 
 namespace program1 {
 
@@ -37,44 +40,98 @@ void free();
 
 // Global variables
 GLFWwindow* window;
-Cube *cube;
-Plane* plane;
+Camera* camera;
+GLuint shaderProgram;
+GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
 
+// Cube* cube;
+Sphere* sphere1;
+Sphere* sphere2;
+Sphere* sphere3;
+Box* box;
+MassSpringDamper* msd;
+
+// Standard acceleration due to gravity
+#define g 9.80665f
 
 void createContext() {
-    cube = new Cube(vec3(0,0,0), 10);
-    cube->createContext();
+    shaderProgram = loadShaders("deformable.vert", "deformable.frag");
 
-    plane = new Plane();
-    plane->createContext();
+    projectionMatrixLocation = glGetUniformLocation(shaderProgram, "P");
+    viewMatrixLocation = glGetUniformLocation(shaderProgram, "V");
+    modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    box = new Box(8);
+    sphere1 = new Sphere(vec3(4, 4, 4), vec3(1, 1, 1), 0.4, 10);
 }
 
-
 void free() {
-    delete cube;
-    delete plane;
-
+    delete sphere1;
+    delete box;
+    glDeleteProgram(shaderProgram);
     glfwTerminate();
 }
 
-
 void mainLoop() {
+    float t = glfwGetTime();
+    vec3 lightPos = vec3(10, 10, 10);
+    camera->position = glm::vec3(box->size / 2, box->size / 2, 20);
+    float maxEnergy = 0;
     do {
-        // Depth test  | GL_DEPTH_BUFFER_BIT
-        // Clear the screen (color and depth)
+        // calculate dt
+        float currentTime = glfwGetTime();
+        float dt = currentTime - t;
+
+        // Task 2e: change dt to 0.001f and observe the total energy, then change
+        // the numerical integration method to Runge - Kutta 4th order (in RigidBody.cpp)
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cube->draw();
-        plane->draw();
+        glUseProgram(shaderProgram);
+
+        // camera
+        camera->update();
+        mat4 projectionMatrix = camera->projectionMatrix;
+        mat4 viewMatrix = camera->viewMatrix;
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
+
+        // box
+        box->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &box->modelMatrix[0][0]);
+        box->draw();
+
+        
+        handleBoxSphereCollision(*box, *sphere1);
+
+        // Task 2c: model the force due to gravity
+        sphere1->forcing = [&](float t, const vector<float>& y)->vector<float> {
+            vector<float> f(6, 0.0f);
+            f[1] = -sphere1->m * g;
+			// f[1] = 0;
+            return f;
+        };
+        sphere1->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &sphere1->modelMatrix[0][0]);
+        sphere1->draw();
+
+
+        // Calculate the total energy and comment on the previous
+        float KE = sphere1->calcKinecticEnergy();
+		float PE = sphere1->m * g * sphere1->x.y;
+        float T = KE + PE;
+        if (T > maxEnergy) {
+            cout << "Total Energy: " << T << endl;
+            maxEnergy = T;
+        }
+
+        t += dt;
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
 }
-
 
 void initialize() {
     // Initialize GLFW
@@ -110,18 +167,35 @@ void initialize() {
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
+    // Hide the mouse and enable unlimited movement
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // Set the mouse at the center of the screen
+    glfwPollEvents();
+    glfwSetCursorPos(window, W_WIDTH / 2, W_HEIGHT / 2);
+
     // Gray background color
     glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 
-    // Task 12: Enable depth test
+    // Enable depth test
     glEnable(GL_DEPTH_TEST);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
 
+    // Cull triangles which normal is not towards the camera
+    glEnable(GL_CULL_FACE);
+    // glFrontFace(GL_CW);
+    // glFrontFace(GL_CCW);
+
+    // enable point size when drawing points
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
     // Log
     logGLParameters();
-}
 
+    // Create camera
+    camera = new Camera(window);
+}
 
 int main(int argc, char* argv[]) {
     try {
