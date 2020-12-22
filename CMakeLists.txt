@@ -89,6 +89,8 @@ add_executable(deformable
   src/staircase.h
   src/Plane.cpp
   src/Plane.h
+  src/DeformableBody.cpp
+  src/DeformableBody.h
 
   src/RigidBody.cpp
   src/RigidBody.h

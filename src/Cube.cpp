@@ -5,8 +5,7 @@
 
 using namespace glm;
 
-Cube::Cube(vec3 pos, vec3 vel, vec3 omega, float length, float mass)
-    : RigidBody() {
+Cube::Cube(vec3 pos, vec3 vel, vec3 omega, float length, float mass) : DeformableBody() {
     cube = new Drawable("models/cube.obj");
 
     l = length;

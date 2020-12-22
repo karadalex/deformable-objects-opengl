@@ -1,11 +1,11 @@
 #ifndef CUBE_H
 #define CUBE_H
 
-#include "RigidBody.h"
+#include "DeformableBody.h"
 
 class Drawable;
 
-class Cube : public RigidBody {
+class Cube : public DeformableBody {
 public:
     Drawable* cube;
     float l;
