@@ -22,12 +22,6 @@ bool checkForPlaneSphereCollision(vec3& pos, const float& r, const float& size, 
         pos = pos + vec3(0, dis, 0);
 
         n = vec3(0, -1, 0);
-    } else if (pos.y + r >= size && insideXZ) {
-        //correction
-        float dis = size - (pos.y + r);
-        pos = pos + vec3(0, dis, 0);
-
-        n = vec3(0, 1, 0);
     } else {
         return false;
     }
@@ -51,12 +45,6 @@ bool checkForPlaneCubeCollision(vec3& pos, const float& r, const float& size, ve
         pos = pos + vec3(0, dis, 0);
 
         n = vec3(0, -1, 0);
-    } else if (pos.y + r >= size && insideXZ) {
-        //correction
-        float dis = size - (pos.y + r);
-        pos = pos + vec3(0, dis, 0);
-
-        n = vec3(0, 1, 0);
     } else {
         return false;
     }
