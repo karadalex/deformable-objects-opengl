@@ -17,9 +17,6 @@
 #include <common/util.h>
 #include <common/camera.h>
 
-// #include "Cube.h"
-#include "Sphere.h"
-#include "MassSpringDamper.h"
 #include "Collision.h"
 #include "Plane.h"
 #include "Cube.h"

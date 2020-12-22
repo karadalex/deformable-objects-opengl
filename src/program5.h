@@ -11,16 +11,18 @@
 // Include GLM
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp>   // glm::to_string
 
 // Shader loading utilities and other
 #include <common/shader.h>
 #include <common/util.h>
+#include <common/camera.h>
 
-#include "CubeCustom.h"
-#include "staircase.h"
+#include "Collision.h"
+#include "Plane.h"
+#include "Cube.h"
+#include "Staircase.h"
 
-namespace program5 { 
+namespace program5 {
 
 using namespace std;
 using namespace glm;
@@ -33,48 +35,104 @@ void free();
 
 #define W_WIDTH 1024
 #define W_HEIGHT 768
-#define TITLE "Experiment 5 - Free-form deformation of objects"
+#define TITLE "Experiment 5 - Free-form deformation of objectst"
 
 // Global variables
 GLFWwindow* window;
-CubeCustom *cube;
-Staircase *staircase;
+Camera* camera;
+GLuint shaderProgram;
+GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
 
+// Scene objects
+Plane* plane;
+Cube* cube;
+Staircase* staircase;
+
+// Standard acceleration due to gravity
+#define g 9.80665f
 
 void createContext() {
-    cube = new CubeCustom(vec3(0,0,0), 10);
-    cube->createContext();
+    shaderProgram = loadShaders("deformable.vert", "deformable.frag");
 
-    staircase = new Staircase(10, vec3(0,0,0));
-    staircase->createContext();
+    projectionMatrixLocation = glGetUniformLocation(shaderProgram, "P");
+    viewMatrixLocation = glGetUniformLocation(shaderProgram, "V");
+    modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    plane = new Plane(8);
+    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 2, 10);
+    staircase = new Staircase(1);
 }
 
-
 void free() {
-    delete cube;
+    delete plane;
     delete staircase;
-
+    delete cube;
+    glDeleteProgram(shaderProgram);
     glfwTerminate();
 }
 
-
 void mainLoop() {
+    float t = glfwGetTime();
+    vec3 lightPos = vec3(10, 10, 10);
+    camera->position = glm::vec3(8, 8, 20);
+    float maxEnergy = 0;
+
     do {
-        // Depth test  | GL_DEPTH_BUFFER_BIT
-        // Clear the screen (color and depth)
+        // calculate dt
+        float currentTime = glfwGetTime();
+        float dt = currentTime - t;
+
+        // Change dt to 0.001f and observe the total energy, then change
+        // the numerical integration method to Runge - Kutta 4th order (in RigidBody.cpp)
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        cube->draw();
+        glUseProgram(shaderProgram);
+
+        // camera
+        camera->update();
+        mat4 projectionMatrix = camera->projectionMatrix;
+        mat4 viewMatrix = camera->viewMatrix;
+        glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
+        glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
+
+        plane->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
+        plane->draw();
+
+        staircase->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
         staircase->draw();
+        
+        handlePlaneCubeCollision(*plane, *cube);
+
+        // Task 2c: model the force due to gravity
+        cube->forcing = [&](float t, const vector<float>& y)->vector<float> {
+            vector<float> f(6, 0.0f);
+            f[1] = -cube->m * g;
+            return f;
+        };
+        cube->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
+        cube->draw();
+
+
+        // Calculate the total energy and comment on the previous
+        // float KE = cube->calcKinecticEnergy();
+		// float PE = cube->m * g * cube->x.y;
+        // float T = KE + PE;
+        // if (T > maxEnergy) {
+        //     cout << "Total Energy: " << T << endl;
+        //     maxEnergy = T;
+        // }
+
+        t += dt;
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
 }
-
 
 void initialize() {
     // Initialize GLFW
@@ -110,18 +168,35 @@ void initialize() {
     // Ensure we can capture the escape key being pressed below
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
+    // Hide the mouse and enable unlimited movement
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // Set the mouse at the center of the screen
+    glfwPollEvents();
+    glfwSetCursorPos(window, W_WIDTH / 2, W_HEIGHT / 2);
+
     // Gray background color
     glClearColor(0.5f, 0.5f, 0.5f, 0.0f);
 
-    // Task 12: Enable depth test
+    // Enable depth test
     glEnable(GL_DEPTH_TEST);
     // Accept fragment if it closer to the camera than the former one
     glDepthFunc(GL_LESS);
 
+    // Cull triangles which normal is not towards the camera
+    glEnable(GL_CULL_FACE);
+    // glFrontFace(GL_CW);
+    // glFrontFace(GL_CCW);
+
+    // enable point size when drawing points
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
     // Log
     logGLParameters();
-}
 
+    // Create camera
+    camera = new Camera(window);
+}
 
 int main(int argc, char* argv[]) {
     try {
