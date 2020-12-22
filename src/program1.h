@@ -46,9 +46,8 @@ Camera* camera;
 GLuint shaderProgram;
 GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
 
-// Cube* cube;
+// Scene objects
 Sphere* sphere1;
-Box* box;
 Plane* plane;
 Cube* cube;
 
@@ -62,15 +61,13 @@ void createContext() {
     viewMatrixLocation = glGetUniformLocation(shaderProgram, "V");
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
-    box = new Box(8);
     plane = new Plane(8);
-    sphere1 = new Sphere(vec3(4, 4, 4), vec3(1, 1, 1), 0.4, 10);
+    sphere1 = new Sphere(vec3(4, 4, 4), vec3(0, -1, 0), 0.4, 10);
     cube = new Cube(vec3(4, 5, 4), vec3(0, 0, 0), vec3(1, 0, 1), 0.5, 1);
 }
 
 void free() {
     delete sphere1;
-    delete box;
     delete plane;
     delete cube;
     glDeleteProgram(shaderProgram);
@@ -80,7 +77,7 @@ void free() {
 void mainLoop() {
     float t = glfwGetTime();
     vec3 lightPos = vec3(10, 10, 10);
-    camera->position = glm::vec3(box->size / 2, box->size / 2, 20);
+    camera->position = glm::vec3(8, 8, 20);
     float maxEnergy = 0;
     do {
         // calculate dt
@@ -101,11 +98,6 @@ void mainLoop() {
         glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
         glUniformMatrix4fv(projectionMatrixLocation, 1, GL_FALSE, &projectionMatrix[0][0]);
 
-        // box
-        box->update(t, dt);
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &box->modelMatrix[0][0]);
-        box->draw();
-
         plane->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
@@ -114,7 +106,7 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
         cube->draw();
         
-        handleBoxSphereCollision(*box, *sphere1);
+        handlePlaneSphereCollision(*plane, *sphere1);
 
         // Task 2c: model the force due to gravity
         sphere1->forcing = [&](float t, const vector<float>& y)->vector<float> {

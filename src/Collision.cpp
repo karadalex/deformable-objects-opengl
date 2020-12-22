@@ -1,9 +1,38 @@
 #include "Collision.h"
-#include "Box.h"
-#include "Sphere.h"
+
 
 using namespace glm;
 using namespace std;
+
+
+void handlePlaneSphereCollision(Plane& plane, Sphere& sphere) {
+    vec3 n;
+    if (checkForPlaneSphereCollision(sphere.x, sphere.r, plane.size, n)) {
+        // Define the velocity of the sphere after the collision
+		sphere.v = sphere.v -2.0f * dot(sphere.v, n) * n;
+		sphere.P = sphere.v * sphere.m;
+    }
+}
+
+bool checkForPlaneSphereCollision(vec3& pos, const float& r, const float& size, vec3& n) {
+    bool insideXZ = true; // TODO: Check if sphere is inside XZ plane
+    if (pos.y - r <= 0 && insideXZ) {
+        //correction
+        float dis = -(pos.y - r);
+        pos = pos + vec3(0, dis, 0);
+
+        n = vec3(0, -1, 0);
+    } else if (pos.y + r >= size && insideXZ) {
+        //correction
+        float dis = size - (pos.y + r);
+        pos = pos + vec3(0, dis, 0);
+
+        n = vec3(0, 1, 0);
+    } else {
+        return false;
+    }
+    return true;
+}
 
 void handleBoxSphereCollision(Box& box, Sphere& sphere) {
     vec3 n;
