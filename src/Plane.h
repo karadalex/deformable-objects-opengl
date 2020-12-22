@@ -1,35 +1,24 @@
 #ifndef PLANE_H
 #define PLANE_H
 
-#include <iostream>
-#include <vector>
-#include <GL/glew.h>
-#include <glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtx/string_cast.hpp> 
-#include <common/shader.h>
 
-using namespace std;
-using namespace glm;
+class Drawable;
 
-class Plane
-{
+/**
+ * Represents the bounding box
+ */
+class Plane {
 public:
-    GLuint planeVAO;
-    GLuint planeVerticesVBO, planeColorsVBO;
-    GLuint MVPLocation;
-    GLuint shaderProgram;
-    GLfloat previousTime, dt;
+    Drawable* plane;
+    float size;
+    glm::mat4 modelMatrix;
 
-    vector<GLfloat> planeVertices;
-
-    Plane();
-
-    void createContext();
-    void draw();
-
+    Plane(float s);
     ~Plane();
+
+    void draw(unsigned int drawable = 0);
+    void update(float t = 0, float dt = 0);
 };
 
-#endif // PLANE_H
+#endif

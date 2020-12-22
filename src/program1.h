@@ -22,6 +22,8 @@
 #include "Box.h"
 #include "MassSpringDamper.h"
 #include "Collision.h"
+#include "Plane.h"
+#include "Cube.h"
 
 namespace program1 {
 
@@ -46,10 +48,9 @@ GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
 
 // Cube* cube;
 Sphere* sphere1;
-Sphere* sphere2;
-Sphere* sphere3;
 Box* box;
-MassSpringDamper* msd;
+Plane* plane;
+Cube* cube;
 
 // Standard acceleration due to gravity
 #define g 9.80665f
@@ -62,12 +63,16 @@ void createContext() {
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
     box = new Box(8);
+    plane = new Plane(8);
     sphere1 = new Sphere(vec3(4, 4, 4), vec3(1, 1, 1), 0.4, 10);
+    cube = new Cube(vec3(4, 5, 4), vec3(0, 0, 0), vec3(1, 0, 1), 0.5, 1);
 }
 
 void free() {
     delete sphere1;
     delete box;
+    delete plane;
+    delete cube;
     glDeleteProgram(shaderProgram);
     glfwTerminate();
 }
@@ -101,6 +106,13 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &box->modelMatrix[0][0]);
         box->draw();
 
+        plane->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
+        plane->draw();
+
+        cube->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
+        cube->draw();
         
         handleBoxSphereCollision(*box, *sphere1);
 
