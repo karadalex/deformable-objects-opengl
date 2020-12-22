@@ -17,7 +17,7 @@
 #include <common/shader.h>
 #include <common/util.h>
 
-#include "cube.h"
+#include "CubeCustom.h"
 #include "staircase.h"
 
 namespace program5 { 
@@ -37,12 +37,12 @@ void free();
 
 // Global variables
 GLFWwindow* window;
-Cube *cube;
+CubeCustom *cube;
 Staircase *staircase;
 
 
 void createContext() {
-    cube = new Cube(vec3(0,0,0), 10);
+    cube = new CubeCustom(vec3(0,0,0), 10);
     cube->createContext();
 
     staircase = new Staircase(10, vec3(0,0,0));
