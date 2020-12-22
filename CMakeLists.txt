@@ -83,14 +83,14 @@ add_definitions(
 # deformable
 add_executable(deformable
   src/deformable.cpp
-  src/CubeCustom.cpp
-  src/CubeCustom.h
   src/Staircase.cpp
   src/Staircase.h
   src/Plane.cpp
   src/Plane.h
   src/DeformableBody.cpp
   src/DeformableBody.h
+  src/Particle.cpp
+  src/Particle.h
 
   src/RigidBody.cpp
   src/RigidBody.h
