@@ -160,6 +160,17 @@ if (NOT ${CMAKE_GENERATOR} MATCHES "Xcode" )
             ${CMAKE_SOURCE_DIR}/src/shaders/*.*
             ${CMAKE_CURRENT_BINARY_DIR})
 
+  add_custom_command(
+    TARGET deformable POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+            ${CMAKE_CURRENT_BINARY_DIR}/models)
+
+  add_custom_command(
+    TARGET deformable POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+            ${CMAKE_SOURCE_DIR}/src/models/*.*
+            ${CMAKE_CURRENT_BINARY_DIR}/models/)
+
 elseif (${CMAKE_GENERATOR} MATCHES "Xcode" )
 
 endif (NOT ${CMAKE_GENERATOR} MATCHES "Xcode" )
