@@ -38,7 +38,7 @@ void Cube::update(float t, float dt) {
     cube->update(t, dt);
 
     // numerical integration
-    advanceState(t, dt);
+    // advanceState(t, dt);
 
     // compute model matrix
     mat4 scale = glm::scale(mat4(), vec3(l, l, l));

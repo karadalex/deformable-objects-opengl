@@ -99,11 +99,6 @@ void mainLoop() {
         handlePlaneCubeCollision(*plane, *cube);
 
         // Task 2c: model the force due to gravity
-        cube->forcing = [&](float t, const vector<float>& y)->vector<float> {
-            vector<float> f(6, 0.0f);
-            f[1] = -cube->m * g;
-            return f;
-        };
         cube->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
         cube->draw();

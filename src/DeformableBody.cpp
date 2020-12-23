@@ -4,6 +4,9 @@
 using namespace glm;
 using namespace std;
 
+// Standard acceleration due to gravity
+#define g 9.80665f
+
 // Load object using Drawble Class and then for each vertex create
 // create and assign a Particle
 DeformableBody::DeformableBody(std::string path) : Drawable(path) {
@@ -15,15 +18,8 @@ DeformableBody::DeformableBody(std::string path) : Drawable(path) {
         throw runtime_error("File format not supported: " + path);
     }
 
-    for (int i = 0; i < vertices.size(); i++) {
-        float r = (rand() % 100)/50;
-        vertices.at(i).x += r;
-        r = (rand() % 100)/50;
-        vertices.at(i).y += r;
-        r = (rand() % 100)/50;
-        vertices.at(i).z += r;
-    }
     createContext();
+
     for (int i = 0; i < indexedVertices.size(); i++) {
         vec3 vertex = indexedVertices.at(i);
         vec3 vel = vec3(0, 0, 0);
@@ -37,18 +33,15 @@ DeformableBody::DeformableBody(std::string path) : Drawable(path) {
 
 void DeformableBody::update(float t, float dt) {
     for (int i = 0; i < particleSystem.size(); i++) {
+        particleSystem.at(i)->forcing = [&](float t, const vector<float>& y)->vector<float> {
+            vector<float> f(6, 0.0f);
+            f[1] = particleSystem.at(i)->m * g;
+            return f;
+        };
         // Update particle's physics state
         particleSystem.at(i)->update(t, dt);
         // Get new position of particle and save it in the vertex
         indexedVertices.at(i) = particleSystem.at(i)->x;
-    }
-    for (int i = 0; i < indexedVertices.size(); i++) {
-        float r = (rand() % 100)/50;
-        indexedVertices.at(i).x += r;
-        r = (rand() % 100)/50;
-        indexedVertices.at(i).y += r;
-        r = (rand() % 100)/50;
-        indexedVertices.at(i).z += r;
     }
 
     // Update Vertices with new positions
