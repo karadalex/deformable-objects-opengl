@@ -26,17 +26,25 @@ DeformableBody::DeformableBody(std::string path) : Drawable(path) {
         Particle* particle = new Particle(vertex, vel, 1);
         particleSystem.push_back(particle);
         cout << "Particle " << i << " " << particle << endl;
-        
     }
     cout << "Initialized Particle System with " << particleSystem.size() << " particles" << endl;
 }
 
 
 void DeformableBody::update(float t, float dt) {
-    for (int i = 0; i < particleSystem.size(); i++) {
+    for (int i = 3; i < particleSystem.size(); i++) {
+        // TODO: Calculate total force for particle:
+        // Forces: gravity, spring-damp, shear, bending, collision
+        vec3 force = vec3(
+            0,
+            particleSystem.at(i)->m * g,
+            0
+        );
         particleSystem.at(i)->forcing = [&](float t, const vector<float>& y)->vector<float> {
             vector<float> f(6, 0.0f);
-            f[1] = particleSystem.at(i)->m * g;
+            f[0] = force.x;
+            f[1] = force.y;
+            f[2] = force.z;
             return f;
         };
         // Update particle's physics state
@@ -44,7 +52,7 @@ void DeformableBody::update(float t, float dt) {
         // Get new position of particle and save it in the vertex
         indexedVertices.at(i) = particleSystem.at(i)->x;
     }
-    cout << particleSystem.at(0) << endl;
+    // cout << particleSystem.at(0) << endl;
 
     // Update Vertices with new positions
     glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
