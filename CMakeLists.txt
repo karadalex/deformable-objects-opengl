@@ -122,8 +122,6 @@ add_executable(deformable
 
   src/shaders/deformable.vert
   src/shaders/deformable.frag
-  src/shaders/deformable.geom
-  src/shaders/main.vert
 )
 target_link_libraries(deformable
   ${ALL_LIBS}
@@ -156,9 +154,14 @@ if (NOT ${CMAKE_GENERATOR} MATCHES "Xcode" )
 
   add_custom_command(
     TARGET deformable POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory
+          ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+  
+  add_custom_command(
+    TARGET deformable POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
             ${CMAKE_SOURCE_DIR}/src/shaders/*.*
-            ${CMAKE_CURRENT_BINARY_DIR})
+            ${CMAKE_CURRENT_BINARY_DIR}/shaders/)
 
   add_custom_command(
     TARGET deformable POST_BUILD

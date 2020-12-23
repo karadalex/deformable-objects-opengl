@@ -52,7 +52,7 @@ Staircase* staircase;
 #define g 9.80665f
 
 void createContext() {
-    shaderProgram = loadShaders("deformable.vert", "deformable.frag");
+    shaderProgram = loadShaders("shaders/deformable.vert", "shaders/deformable.frag");
 
     projectionMatrixLocation = glGetUniformLocation(shaderProgram, "P");
     viewMatrixLocation = glGetUniformLocation(shaderProgram, "V");
