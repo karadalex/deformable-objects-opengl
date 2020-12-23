@@ -37,11 +37,11 @@ void handlePlaneCubeCollision(Plane& plane, Cube& cube) {
     }
 }
 
-bool checkForPlaneCubeCollision(vec3& pos, const float& r, const float& size, vec3& n) {
+bool checkForPlaneCubeCollision(vec3& pos, const float& l, const float& size, vec3& n) {
     bool insideXZ = true; // TODO: Check if cube is inside XZ plane
-    if (pos.y - r <= 0 && insideXZ) {
+    if (pos.y - l/2 <= 0 && insideXZ) {
         //correction
-        float dis = -(pos.y - r);
+        float dis = -(pos.y - l/2);
         pos = pos + vec3(0, dis, 0);
 
         n = vec3(0, -1, 0);
