@@ -20,7 +20,7 @@ void Plane::draw(unsigned int drawable) {
 }
 
 void Plane::update(float t, float dt) {
-    mat4 translate = glm::translate(mat4(), vec3(size / 2, 0, size / 2));
+    mat4 translate = mat4();
     mat4 scale = glm::scale(mat4(), vec3(size, size, size));
     modelMatrix = translate * scale;
 }
