@@ -8,9 +8,11 @@
 #include <string>
 #include <iostream>
 
+
 class DeformableBody : public Drawable {
 public:
     DeformableBody(std::string path);
+    void update(float t = 0, float dt = 0);
     ~DeformableBody();
 
     std::vector<Particle*> particleSystem;

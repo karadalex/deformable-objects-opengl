@@ -1,9 +1,5 @@
 #include "Particle.h"
-#include <glm/gtc/matrix_transform.hpp>
-#include <common/model.h>
-#include <iostream>
 
-using namespace glm;
 
 Particle::Particle(vec3 pos, vec3 vel, float mass) : RigidBody() {
     m = mass;
