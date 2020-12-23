@@ -1,5 +1,5 @@
-#ifndef SPHERE_H
-#define SPHERE_H
+#ifndef DEFORMABLE_BODY_H
+#define DEFORMABLE_BODY_H
 
 #include "RigidBody.h"
 #include "Particle.h"
