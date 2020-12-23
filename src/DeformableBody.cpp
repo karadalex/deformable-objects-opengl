@@ -23,9 +23,10 @@ DeformableBody::DeformableBody(std::string path) : Drawable(path) {
     for (int i = 0; i < indexedVertices.size(); i++) {
         vec3 vertex = indexedVertices.at(i);
         vec3 vel = vec3(0, 0, 0);
-        Particle* particle = new Particle(vertex, vel, 0.1);
+        Particle* particle = new Particle(vertex, vel, 1);
         particleSystem.push_back(particle);
         cout << "Particle " << i << " " << particle << endl;
+        
     }
     cout << "Initialized Particle System with " << particleSystem.size() << " particles" << endl;
 }
@@ -43,6 +44,7 @@ void DeformableBody::update(float t, float dt) {
         // Get new position of particle and save it in the vertex
         indexedVertices.at(i) = particleSystem.at(i)->x;
     }
+    cout << particleSystem.at(0) << endl;
 
     // Update Vertices with new positions
     glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);

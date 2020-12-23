@@ -29,12 +29,15 @@ bool checkForPlaneSphereCollision(vec3& pos, const float& r, const float& size, 
 }
 
 void handlePlaneCubeCollision(Plane& plane, Cube& cube) {
-    vec3 n;
-    if (checkForPlaneCubeCollision(cube.x, cube.l, plane.size, n)) {
-        // Define the velocity of the cube after the collision
-		cube.v = cube.v -2.0f * dot(cube.v, n) * n;
-		cube.P = cube.v * cube.m;
+    for (int i = 0; i < cube.cube->particleSystem.size(); i++) {
+        vec3 n;
+        if (checkForPlaneParticleCollision(cube.cube->particleSystem.at(i)->x, n)) {
+            // Define the velocity of the cube after the collision
+            cube.cube->particleSystem.at(i)->v = cube.cube->particleSystem.at(i)->v - 2.0f * dot(cube.cube->particleSystem.at(i)->v, n) * n;
+            cube.cube->particleSystem.at(i)->P = cube.cube->particleSystem.at(i)->v * cube.cube->particleSystem.at(i)->m;
+        }
     }
+    
 }
 
 bool checkForPlaneCubeCollision(vec3& pos, const float& l, const float& size, vec3& n) {
@@ -50,6 +53,21 @@ bool checkForPlaneCubeCollision(vec3& pos, const float& l, const float& size, ve
     }
     return true;
 }
+
+
+bool checkForPlaneParticleCollision(vec3& particle_pos, vec3& n) {
+    if (particle_pos.y >= 7) {
+        //correction
+        float dis = -particle_pos.y;
+        particle_pos += vec3(0, dis, 0);
+
+        n = vec3(0, 1, 0);
+    } else {
+        return false;
+    }
+    return true;
+}
+
 
 void handleSphereSphereCollision(Sphere& sphere1, Sphere& sphere2)
 {
