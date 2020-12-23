@@ -74,7 +74,7 @@ void free() {
 void mainLoop() {
     float t = glfwGetTime();
     vec3 lightPos = vec3(10, 10, 10);
-    camera->position = glm::vec3(8, 8, 20);
+    camera->position = glm::vec3(0, 8, 30);
     float maxEnergy = 0;
 
     do {
