@@ -57,7 +57,7 @@ void createContext() {
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
     plane = new Plane(8);
-    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 2, 10);
+    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 1, 10);
 }
 
 void free() {
@@ -107,7 +107,6 @@ void mainLoop() {
         cube->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
         cube->draw();
-
 
         // Calculate the total energy and comment on the previous
         // float KE = cube->calcKinecticEnergy();

@@ -35,6 +35,8 @@ void Cube::draw(unsigned int drawable) {
 }
 
 void Cube::update(float t, float dt) {
+    cube->update(t, dt);
+
     // numerical integration
     advanceState(t, dt);
 

@@ -368,8 +368,7 @@ void Drawable::createContext() {
 
     glGenBuffers(1, &verticesVBO);
     glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
-    glBufferData(GL_ARRAY_BUFFER, indexedVertices.size() * sizeof(vec3),
-                 &indexedVertices[0], GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, indexedVertices.size() * sizeof(vec3), &indexedVertices[0], GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(0);
 

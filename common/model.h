@@ -76,6 +76,7 @@ public:
 
     /* Bind VAO before calling draw */
     void draw(int mode = GL_TRIANGLES);
+    void createContext();
 
 public:
     std::vector<glm::vec3> vertices, normals, indexedVertices, indexedNormals;
@@ -83,9 +84,6 @@ public:
     std::vector<unsigned int> indices;
 
     GLuint VAO, verticesVBO, uvsVBO, normalsVBO, elementVBO;
-
-private:
-    void createContext();
 };
 
 /*****************************************************************************/
