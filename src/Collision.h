@@ -6,6 +6,7 @@
 #include "Cube.h"
 #include "Staircase.h"
 #include "Particle.h"
+#include "DeformableModel.h"
 #include <glm/glm.hpp>
 
 class Box;
@@ -16,6 +17,7 @@ bool checkForPlaneSphereCollision(glm::vec3& pos, const float& r, const float& s
 
 void handlePlaneCubeCollision(Plane& plane, Cube& cube);
 bool checkForPlaneCubeCollision(glm::vec3& pos, const float& l, const float& size, glm::vec3& n);
+bool handlePlaneModelCollision(Plane& plane, DeformableModel& model);
 bool checkForPlaneParticleCollision(vec3& particle_pos, vec3& n);
 
 void handleSphereSphereCollision(Sphere& sphere1, Sphere& sphere2);

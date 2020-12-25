@@ -99,6 +99,8 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
 
+        // handlePlaneModelCollision(*plane, *deformableModel);
+
         deformableModel->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &deformableModel->modelMatrix[0][0]);
         deformableModel->draw();
