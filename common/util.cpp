@@ -72,3 +72,39 @@ bool fileExists(const std::string & abs_filename) {
 
     return ret;
 }
+
+
+std::string selectObject() {
+    std::string obj_models[20] = {
+		"armadillo_low_low.obj",
+		"b66_L2.obj",
+		"bone.obj",
+		"bunny_low.obj",
+		"cube.obj",
+		"dolphin.obj",
+		"dragon_low_low.obj",
+		"flashlight.obj",
+		"flashlightNoCentered.obj",
+		"hand2.obj",
+		"icosahedron.obj",
+		"Phone_v02.obj",
+		"pins.obj",
+		"polyhedron.obj",
+        "sphere.obj",
+        "spring.obj",
+		"suzanne.obj",
+		"teapotMultiMesh.obj",
+		"unicorn_low.obj",
+		"unicorn_low_low.obj"
+	};
+	cout << "Select model (1-20): " << endl;
+    for (int i = 0; i < 20; i++) {
+		cout << i+1 << " " << obj_models[i] << endl;
+	}
+	string model_file;
+	int ind;
+	cin >> ind;
+	model_file = obj_models[ind - 1];
+    
+    return model_file;
+}

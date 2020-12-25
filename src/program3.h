@@ -19,8 +19,7 @@
 
 #include "Collision.h"
 #include "Plane.h"
-#include "Cube.h"
-#include "Staircase.h"
+#include "DeformableModel.h"
 
 namespace program3 {
 
@@ -42,11 +41,13 @@ GLFWwindow* window;
 Camera* camera;
 GLuint shaderProgram;
 GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
+string selectedModelFile;
 
 // Scene objects
 Plane* plane;
 Cube* cube;
 Staircase* staircase;
+DeformableModel* deformableModel;
 
 // Standard acceleration due to gravity
 #define g 9.80665f
@@ -59,14 +60,12 @@ void createContext() {
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
     plane = new Plane(8);
-    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 2, 10);
-    staircase = new Staircase(1);
+    deformableModel = new DeformableModel(selectedModelFile, vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 0.1, 10);
 }
 
 void free() {
     delete plane;
-    delete staircase;
-    delete cube;
+    delete deformableModel;
     glDeleteProgram(shaderProgram);
     glfwTerminate();
 }
@@ -100,22 +99,9 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
 
-        staircase->update(t, dt);
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
-        staircase->draw();
-        
-        handlePlaneCubeCollision(*plane, *cube);
-
-        // Task 2c: model the force due to gravity
-        cube->forcing = [&](float t, const vector<float>& y)->vector<float> {
-            vector<float> f(6, 0.0f);
-            f[1] = -cube->m * g;
-            return f;
-        };
-        cube->update(t, dt);
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
-        cube->draw();
-
+        deformableModel->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &deformableModel->modelMatrix[0][0]);
+        deformableModel->draw();
 
         // Calculate the total energy and comment on the previous
         // float KE = cube->calcKinecticEnergy();
@@ -202,6 +188,7 @@ void initialize() {
 
 int main(int argc, char* argv[]) {
     try {
+        selectedModelFile = "models/" + selectObject();
         initialize();
         createContext();
         mainLoop();

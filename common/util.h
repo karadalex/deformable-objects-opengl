@@ -41,4 +41,9 @@ std::string getBaseDir(const std::string& filepath);
 */
 bool fileExists(const std::string& abs_filename);
 
+/**
+ * Show list of avaialable models and select model
+ */
+std::string selectObject();
+
 #endif

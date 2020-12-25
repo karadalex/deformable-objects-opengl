@@ -89,6 +89,8 @@ add_executable(deformable
   src/Plane.h
   src/DeformableBody.cpp
   src/DeformableBody.h
+  src/DeformableModel.cpp
+  src/DeformableModel.h
   src/Particle.cpp
   src/Particle.h
 
