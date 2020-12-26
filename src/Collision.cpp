@@ -71,7 +71,7 @@ bool handlePlaneModelCollision(Plane& plane, DeformableModel& model) {
 
 
 bool checkForPlaneParticleCollision(vec3& particle_pos, vec3& n) {
-    if (particle_pos.y >= 7) {
+    if (particle_pos.y <= 0) {
         //correction
         float dis = -particle_pos.y;
         particle_pos += vec3(0, dis, 0);

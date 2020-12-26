@@ -6,7 +6,7 @@
 using namespace glm;
 
 Cube::Cube(vec3 pos, vec3 vel, vec3 omega, float length, float mass) : RigidBody() {
-    cube = new DeformableBody("models/cube.obj");
+    cube = new DeformableBody("models/cube.obj", pos, vel, omega, mass);
 
     l = length;
     m = mass;
@@ -41,14 +41,14 @@ void Cube::update(float t, float dt) {
     // advanceState(t, dt);
 
     // compute model matrix
-    mat4 scale = glm::scale(mat4(), vec3(l, l, l));
-    mat4 tranlation = translate(mat4(), vec3(x.x, x.y, x.z));
-#ifdef USE_QUATERNIONS
-    mat4 rotation = mat4_cast(q);
-#else
-    mat4 rotation = mat4(R);
-#endif
-    modelMatrix = tranlation * rotation * scale;
+//     mat4 scale = glm::scale(mat4(), vec3(l, l, l));
+//     mat4 tranlation = translate(mat4(), vec3(x.x, x.y, x.z));
+// #ifdef USE_QUATERNIONS
+//     mat4 rotation = mat4_cast(q);
+// #else
+//     mat4 rotation = mat4(R);
+// #endif
+//     modelMatrix = tranlation * rotation * scale;
 }
 
 

@@ -2,7 +2,7 @@
 
 
 DeformableModel::DeformableModel(string modelFile, vec3 pos, vec3 vel, vec3 omega, float length, float mass) : RigidBody() {
-    model = new DeformableBody(modelFile);
+    model = new DeformableBody(modelFile, pos, vel, omega, mass);
 
     l = length;
     m = mass;
@@ -30,6 +30,5 @@ void DeformableModel::update(float t, float dt) {
     // compute model matrix
     mat4 scale = glm::scale(mat4(), vec3(l, l, l));
     mat4 tranlation = translate(mat4(), vec3(x.x, x.y, x.z));
-    mat4 rotation = rotate(mat4(), 0.0f, vec3(1,0,0));
-    modelMatrix = tranlation * rotation * scale;
+    modelMatrix = tranlation * scale;
 }

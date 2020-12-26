@@ -9,7 +9,7 @@ using namespace std;
 
 // Load object using Drawble Class and then for each vertex create
 // create and assign a Particle
-DeformableBody::DeformableBody(std::string path) : Drawable(path) {
+DeformableBody::DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega, float mass) : Drawable(path) {
     if (path.substr(path.size() - 3, 3) == "obj") {
         loadOBJWithTiny(path.c_str(), vertices, uvs, normals, VEC_UINT_DEFAUTL_VALUE);
     } else if (path.substr(path.size() - 3, 3) == "vtp") {
@@ -20,10 +20,11 @@ DeformableBody::DeformableBody(std::string path) : Drawable(path) {
 
     createContext();
 
+    float particleMass = mass / indexedVertices.size();
+
     for (int i = 0; i < indexedVertices.size(); i++) {
-        vec3 vertex = indexedVertices.at(i);
-        vec3 vel = vec3(0, 0, 0);
-        Particle* particle = new Particle(vertex, vel, 1);
+        vec3 vertex = indexedVertices.at(i) + pos;
+        Particle* particle = new Particle(vertex, vel, particleMass);
         particleSystem.push_back(particle);
         cout << "Particle " << i << " " << particle << endl;
     }
@@ -37,7 +38,7 @@ void DeformableBody::update(float t, float dt) {
         // Forces: gravity, spring-damp, shear, bending, collision
         vec3 force = vec3(
             0,
-            particleSystem.at(i)->m * g,
+            -particleSystem.at(i)->m * g,
             0
         );
         particleSystem.at(i)->forcing = [&](float t, const vector<float>& y)->vector<float> {

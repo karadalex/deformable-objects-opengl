@@ -11,7 +11,7 @@
 
 class DeformableBody : public Drawable {
 public:
-    DeformableBody(std::string path);
+    DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega, float mass);
     void update(float t = 0, float dt = 0);
     ~DeformableBody();
 
