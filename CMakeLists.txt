@@ -100,8 +100,6 @@ add_executable(deformable
   src/Cube.h
   src/Sphere.cpp
   src/Sphere.h
-  src/MassSpringDamper.cpp
-  src/MassSpringDamper.h
   src/Collision.cpp
   src/Collision.h
 

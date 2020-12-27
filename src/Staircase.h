@@ -14,6 +14,10 @@ public:
     float size;
     glm::mat4 modelMatrix;
 
+    /**
+     * @brief Staircase
+     * @param s Staircase scaling factor, defaults to 1.0f
+     */
     Staircase(float s = 1.0f);
     ~Staircase();
 

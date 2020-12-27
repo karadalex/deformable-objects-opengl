@@ -11,7 +11,23 @@
 
 class DeformableBody : public Drawable {
 public:
+    /**
+     * @brief DeformableBody
+     * @param path
+     * @param pos
+     * @param vel
+     * @param omega
+     * @param mass
+     * @param stiffness
+     * @param damping
+     */
     DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
+
+    /**
+     * @brief update
+     * @param t
+     * @param dt
+     */
     void update(float t = 0, float dt = 0);
     ~DeformableBody();
 

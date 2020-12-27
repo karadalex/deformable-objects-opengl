@@ -32,11 +32,13 @@ DeformableBody::DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega,
         cout << "Particle " << i << " " << particle << endl;
     }
     cout << "Initialized Particle System with " << particleSystem.size() << " particles" << endl;
+
+    // TODO: Setup neighbors
 }
 
 
 void DeformableBody::update(float t, float dt) {
-    for (int i = 3; i < particleSystem.size(); i++) {
+    for (int i = 0; i < particleSystem.size(); i++) {
         // TODO: Calculate total force for particle:
         // Forces: gravity, spring-damp, shear, bending, collision
         vec3 gravity = vec3(
