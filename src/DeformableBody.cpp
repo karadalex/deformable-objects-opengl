@@ -23,35 +23,79 @@ DeformableBody::DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega,
 
     createContext();
 
-    float particleMass = mass / indexedVertices.size();
+    particlesNum = indexedVertices.size();
+    float particleMass = mass / particlesNum;
 
-    for (int i = 0; i < indexedVertices.size(); i++) {
+    for (int i = 0; i < particlesNum; i++) {
         vec3 vertex = indexedVertices.at(i) + pos;
         Particle* particle = new Particle(vertex, vel, particleMass);
         particleSystem.push_back(particle);
         cout << "Particle " << i << " " << particle << endl;
     }
-    cout << "Initialized Particle System with " << particleSystem.size() << " particles" << endl;
+    cout << "Initialized Particle System with " << particlesNum << " particles" << endl;
 
-    // TODO: Setup neighbors
+    // Setup structural neighbors
+    // Add connections with previous and next vertices from the indexedVertices array
+    for (int i = 1; i < particlesNum-1; i++) {
+        particleSystem.at(i)->addNeighbor(particleSystem.at(i-1), STRUCT_NEIGHBOR);
+        particleSystem.at(i)->addNeighbor(particleSystem.at(i+1), STRUCT_NEIGHBOR);
+    }
+    // Handle first and last vertices differently
+    particleSystem.at(0)->addNeighbor(particleSystem.at(1), STRUCT_NEIGHBOR);
+    particleSystem.at(particlesNum-1)->addNeighbor(particleSystem.at(particlesNum-2), STRUCT_NEIGHBOR);
+
+    // Uncomment the following for testing purposes
+    // Test that particle 1 has neighbors, and that changes in one neighbor are seen from the others
+    // vec3 p0p1 = particleSystem.at(1)->structDistances.at(0);
+    // float p0p1_sq = p0p1.x*p0p1.x + p0p1.y*p0p1.y + p0p1.z*p0p1.z;
+    // cout << "Rest length of P1 from P0 = " << p0p1_sq << endl;
+    // vec3 p0p1_cur = particleSystem.at(1)->x - particleSystem.at(1)->structNeighbors.at(0)->x;
+    // float p0p1_cur_sq = p0p1_cur.x*p0p1_cur.x + p0p1_cur.y*p0p1_cur.y + p0p1_cur.z*p0p1_cur.z;
+    // cout << "Current distance of P1 from P0 = " << p0p1_cur_sq << endl;
+    // particleSystem.at(0)->x = vec3(0, 0, 0);
+    // cout << "Rest length after change of P1 from P0 = " << p0p1_sq << endl;
+    // p0p1_cur = particleSystem.at(1)->x - particleSystem.at(1)->structNeighbors.at(0)->x;
+    // p0p1_cur_sq = p0p1_cur.x*p0p1_cur.x + p0p1_cur.y*p0p1_cur.y + p0p1_cur.z*p0p1_cur.z;
+    // cout << "Current distance of P1 from P0 = " << p0p1_cur_sq << endl;
+    // cout << "Particle 1 neighbors:" << endl;
+    // for (int i = 0; i < particleSystem.at(1)->structNeighbors.size(); i++) {
+    //     cout << particleSystem.at(1)->structNeighbors.at(i) << endl;
+    // }
+
+    // TODO: Setup shear neighbors
+
+    // TODO: Setup bending neighbors
 }
 
 
 void DeformableBody::update(float t, float dt) {
-    for (int i = 0; i < particleSystem.size(); i++) {
+    for (int i = 0; i < particlesNum; i++) {
+        Particle* prt1 = particleSystem.at(i);
         // TODO: Calculate total force for particle:
         // Forces: gravity, spring-damp, shear, bending, collision
         vec3 gravity = vec3(
             0,
-            -particleSystem.at(i)->m * g,
+            -prt1->m * g,
             0
         );
-        // TODO: Replace with actual neighbor forces
-        vec3 damping = -b*particleSystem.at(i)->v; 
-        vec3 elastic = -k*vec3(0, particleSystem.at(i)->x.y, 0);
+        
+        vec3 damping = -b*prt1->v; 
+        vec3 elastic = -k*vec3(0, prt1->x.y, 0);
+        // vec3 damping = vec3(0,0,0);
+        // vec3 elastic = vec3(0,0,0);
+        // for (int j = 0; j < prt1->structNeighbors.size(); j++) {
+        //     Particle* prt2 = prt1->structNeighbors.at(j);
+        //     vec3 p1p2 = prt1->x - prt2->x;
+        //     float p1p2d = sqrt(p1p2.x*p1p2.x + p1p2.y*p1p2.y + p1p2.z*p1p2.z);
+        //     vec3 unit_vec = p1p2 / p1p2d;
+        //     elastic += -k * (p1p2 - prt1->structDistances.at(j));
+            
+        //     vec3 vel = (dot(prt2->v, unit_vec) - dot(prt1->v, unit_vec)) * unit_vec;
+        //     damping += -b*vel;
+        // }
 
         vec3 force = gravity + elastic + damping;
-        particleSystem.at(i)->forcing = [&](float t, const vector<float>& y)->vector<float> {
+        prt1->forcing = [&](float t, const vector<float>& y)->vector<float> {
             vector<float> f(6, 0.0f);
             f[0] = force.x;
             f[1] = force.y;
@@ -59,15 +103,15 @@ void DeformableBody::update(float t, float dt) {
             return f;
         };
         // Update particle's physics state
-        particleSystem.at(i)->update(t, dt);
+        prt1->update(t, dt);
         // Get new position of particle and save it in the vertex
-        indexedVertices.at(i) = particleSystem.at(i)->x;
+        indexedVertices.at(i) = prt1->x;
     }
     // cout << particleSystem.at(0) << endl;
 
     // Update Vertices with new positions
     glBindBuffer(GL_ARRAY_BUFFER, verticesVBO);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, indexedVertices.size() * sizeof(vec3), &indexedVertices[0]);
+    glBufferSubData(GL_ARRAY_BUFFER, 0, particlesNum * sizeof(vec3), &indexedVertices[0]);
 }
 
 

@@ -32,6 +32,7 @@ public:
     ~DeformableBody();
 
     std::vector<Particle*> particleSystem;
+    int particlesNum;
     
     float k = 0.5; // stiffness
     float b = 0.01; // damping
