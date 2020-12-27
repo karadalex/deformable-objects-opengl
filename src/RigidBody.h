@@ -8,7 +8,7 @@
 #include <glm/gtx/quaternion.hpp>
 
 /**
- * Task 1b: use rotation matrix to encode the orientation of a rigid body
+ * Use rotation matrix to encode the orientation of a rigid body
  * There is a better way to represent the orientation of a rigid body than
  * using a 3 x 3 rotation matrix. For a number of reasons, unit quaternions,
  * a type of four element vector normalized to unit length, are a better choice
