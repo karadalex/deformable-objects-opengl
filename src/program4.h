@@ -59,8 +59,12 @@ void createContext() {
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
     plane = new Plane(8);
-    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 2, 10);
     staircase = new Staircase(1);
+    float length = 1; 
+    float mass = 10;
+    float stiffness = 0.5; 
+    float damping = 0.01;
+    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
 }
 
 void free() {

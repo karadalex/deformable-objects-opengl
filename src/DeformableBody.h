@@ -11,11 +11,14 @@
 
 class DeformableBody : public Drawable {
 public:
-    DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega, float mass);
+    DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
     void update(float t = 0, float dt = 0);
     ~DeformableBody();
 
     std::vector<Particle*> particleSystem;
+    
+    float k = 0.5; // stiffness
+    float b = 0.01; // damping
 };
 
 #endif

@@ -12,7 +12,7 @@ public:
     float l;
     glm::mat4 modelMatrix;
 
-    Cube(glm::vec3 pos, glm::vec3 vel, glm::vec3 omega, float length, float mass);
+    Cube(glm::vec3 pos, glm::vec3 vel, glm::vec3 omega, float length, float mass, float stiffness, float damping);
     ~Cube();
 
     void draw(bool showCubeVertices = false);

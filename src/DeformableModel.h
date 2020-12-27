@@ -18,7 +18,7 @@ public:
     glm::mat4 modelMatrix;
     float l;
 
-    DeformableModel(string modelFile, vec3 pos, vec3 vel, vec3 omega, float length, float mass);
+    DeformableModel(string modelFile, vec3 pos, vec3 vel, vec3 omega, float length, float mass, float stiffness, float damping);
     ~DeformableModel();
 
     void draw(bool showModelVertices = false);

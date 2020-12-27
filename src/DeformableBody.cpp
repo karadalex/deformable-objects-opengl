@@ -9,7 +9,10 @@ using namespace std;
 
 // Load object using Drawble Class and then for each vertex create
 // create and assign a Particle
-DeformableBody::DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega, float mass) : Drawable(path) {
+DeformableBody::DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega, float mass, float stiffness, float damping) : Drawable(path) {
+    k = stiffness;
+    b = damping;
+    
     if (path.substr(path.size() - 3, 3) == "obj") {
         loadOBJWithTiny(path.c_str(), vertices, uvs, normals, VEC_UINT_DEFAUTL_VALUE);
     } else if (path.substr(path.size() - 3, 3) == "vtp") {
@@ -36,11 +39,16 @@ void DeformableBody::update(float t, float dt) {
     for (int i = 3; i < particleSystem.size(); i++) {
         // TODO: Calculate total force for particle:
         // Forces: gravity, spring-damp, shear, bending, collision
-        vec3 force = vec3(
+        vec3 gravity = vec3(
             0,
             -particleSystem.at(i)->m * g,
             0
         );
+        // TODO: Replace with actual neighbor forces
+        vec3 damping = -b*particleSystem.at(i)->v; 
+        vec3 elastic = -k*vec3(0, particleSystem.at(i)->x.y, 0);
+
+        vec3 force = gravity + elastic + damping;
         particleSystem.at(i)->forcing = [&](float t, const vector<float>& y)->vector<float> {
             vector<float> f(6, 0.0f);
             f[0] = force.x;

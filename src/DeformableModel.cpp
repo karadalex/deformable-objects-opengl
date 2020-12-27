@@ -1,8 +1,8 @@
 #include "DeformableModel.h"
 
 
-DeformableModel::DeformableModel(string modelFile, vec3 pos, vec3 vel, vec3 omega, float length, float mass) : RigidBody() {
-    model = new DeformableBody(modelFile, pos, vel, omega, mass);
+DeformableModel::DeformableModel(string modelFile, vec3 pos, vec3 vel, vec3 omega, float length, float mass, float stiffness, float damping) : RigidBody() {
+    model = new DeformableBody(modelFile, pos, vel, omega, mass, stiffness, damping);
 
     l = length;
     m = mass;

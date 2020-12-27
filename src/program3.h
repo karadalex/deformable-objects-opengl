@@ -60,7 +60,11 @@ void createContext() {
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
     plane = new Plane(8);
-    deformableModel = new DeformableModel(selectedModelFile, vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 0.1, 10);
+    float length = 0.1; 
+    float mass = 10;
+    float stiffness = 0.5; 
+    float damping = 0.01;
+    deformableModel = new DeformableModel(selectedModelFile, vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
 }
 
 void free() {
