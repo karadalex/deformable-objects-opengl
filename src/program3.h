@@ -80,6 +80,7 @@ void mainLoop() {
     camera->position = glm::vec3(0, 8, 30);
     float maxEnergy = 0;
     bool showModelVertices = false;
+    bool pausePhysics = false;
 
     do {
         // calculate dt
@@ -106,10 +107,17 @@ void mainLoop() {
 
         handlePlaneModelCollision(*plane, *deformableModel);
 
+        // Simulation toggles
         if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
             showModelVertices = !showModelVertices;
         }
-        deformableModel->update(t, dt);
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+            pausePhysics = !pausePhysics;
+        }
+
+        if (!pausePhysics) {
+            deformableModel->update(t, dt);   
+        }
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &deformableModel->modelMatrix[0][0]);
         deformableModel->draw(showModelVertices);
 

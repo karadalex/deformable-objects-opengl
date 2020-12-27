@@ -64,7 +64,7 @@ void createContext() {
     staircase = new Staircase(2);
     float length = 1; 
     float mass = 10;
-    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
+    cube = new Cube(vec3(0, 8, -8), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
 }
 
 void free() {
@@ -81,6 +81,7 @@ void mainLoop() {
     camera->position = glm::vec3(0, 8, 30);
     float maxEnergy = 0;
     bool showModelVertices = false;
+    bool pausePhysics = false;
 
     do {
         // calculate dt
@@ -111,10 +112,17 @@ void mainLoop() {
         
         handlePlaneCubeCollision(*plane, *cube);
 
+        // Simulation toggles
         if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
             showModelVertices = !showModelVertices;
         }
-        cube->update(t, dt);
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+            pausePhysics = !pausePhysics;
+        }
+
+        if (!pausePhysics) {
+            cube->update(t, dt);   
+        }
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
         cube->draw(showModelVertices);
 

@@ -77,6 +77,7 @@ void mainLoop() {
     camera->position = glm::vec3(0, 8, 30);
     float maxEnergy = 0;
     bool showModelVertices = false;
+    bool pausePhysics = false;
 
     do {
         // calculate dt
@@ -103,10 +104,17 @@ void mainLoop() {
         
         handlePlaneCubeCollision(*plane, *cube);
 
+        // Simulation toggles
         if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
             showModelVertices = !showModelVertices;
         }
-        cube->update(t, dt);
+        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
+            pausePhysics = !pausePhysics;
+        }
+
+        if (!pausePhysics) {
+            cube->update(t, dt);   
+        }
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
         cube->draw(showModelVertices);
 
