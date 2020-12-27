@@ -108,3 +108,11 @@ std::string selectObject() {
     
     return model_file;
 }
+
+
+void getElasticityParameters(float &stiffness, float &damping) {
+    cout << "Set object's stiffness (e.g. 0.5):" << endl;
+    cin >> stiffness;
+    cout << "Set object's damping (e.g. 0.01):" << endl;
+    cin >> damping;
+}

@@ -43,6 +43,8 @@ Camera* camera;
 GLuint shaderProgram;
 GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
 
+float stiffness, damping;
+
 // Scene objects
 Plane* plane;
 Cube* cube;
@@ -62,8 +64,6 @@ void createContext() {
     staircase = new Staircase(1);
     float length = 1; 
     float mass = 10;
-    float stiffness = 0.5; 
-    float damping = 0.01;
     cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
 }
 
@@ -204,6 +204,8 @@ void initialize() {
 
 int main(int argc, char* argv[]) {
     try {
+        getElasticityParameters(stiffness, damping);
+
         initialize();
         createContext();
         mainLoop();

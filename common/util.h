@@ -46,4 +46,10 @@ bool fileExists(const std::string& abs_filename);
  */
 std::string selectObject();
 
+
+/**
+ * Get Elasticity parameters from user's input
+ */ 
+void getElasticityParameters(float &stiffness, float &damping);
+
 #endif
