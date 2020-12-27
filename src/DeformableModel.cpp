@@ -16,9 +16,19 @@ DeformableModel::~DeformableModel() {
     delete model;
 }
 
-void DeformableModel::draw(unsigned int drawable) {
+void DeformableModel::draw(bool showModelVertices) {
+    if (showModelVertices) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDisable(GL_CULL_FACE);    
+    }
+
     model->bind();
     model->draw();
+
+    if (showModelVertices) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glEnable(GL_CULL_FACE);
+    }
 }
 
 void DeformableModel::update(float t, float dt) {

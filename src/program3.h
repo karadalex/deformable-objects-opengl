@@ -75,6 +75,7 @@ void mainLoop() {
     vec3 lightPos = vec3(10, 10, 10);
     camera->position = glm::vec3(0, 8, 30);
     float maxEnergy = 0;
+    bool showModelVertices = false;
 
     do {
         // calculate dt
@@ -99,11 +100,14 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
 
-        // handlePlaneModelCollision(*plane, *deformableModel);
+        handlePlaneModelCollision(*plane, *deformableModel);
 
+        if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+            showModelVertices = !showModelVertices;
+        }
         deformableModel->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &deformableModel->modelMatrix[0][0]);
-        deformableModel->draw();
+        deformableModel->draw(showModelVertices);
 
         // Calculate the total energy and comment on the previous
         // float KE = cube->calcKinecticEnergy();

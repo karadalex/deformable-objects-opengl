@@ -21,7 +21,7 @@ public:
     DeformableModel(string modelFile, vec3 pos, vec3 vel, vec3 omega, float length, float mass);
     ~DeformableModel();
 
-    void draw(unsigned int drawable = 0);
+    void draw(bool showModelVertices = false);
     void update(float t = 0, float dt = 0);
 };
 

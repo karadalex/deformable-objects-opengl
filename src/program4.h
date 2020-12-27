@@ -76,6 +76,7 @@ void mainLoop() {
     vec3 lightPos = vec3(10, 10, 10);
     camera->position = glm::vec3(0, 8, 30);
     float maxEnergy = 0;
+    bool showModelVertices = false;
 
     do {
         // calculate dt
@@ -106,15 +107,12 @@ void mainLoop() {
         
         handlePlaneCubeCollision(*plane, *cube);
 
-        // Task 2c: model the force due to gravity
-        cube->forcing = [&](float t, const vector<float>& y)->vector<float> {
-            vector<float> f(6, 0.0f);
-            f[1] = -cube->m * g;
-            return f;
-        };
+        if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
+            showModelVertices = !showModelVertices;
+        }
         cube->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
-        cube->draw();
+        cube->draw(showModelVertices);
 
 
         // Calculate the total energy and comment on the previous

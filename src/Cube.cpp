@@ -29,9 +29,19 @@ Cube::~Cube() {
     delete cube;
 }
 
-void Cube::draw(unsigned int drawable) {
+void Cube::draw(bool showCubeVertices) {
+    if (showCubeVertices) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDisable(GL_CULL_FACE);    
+    }
+    
     cube->bind();
     cube->draw();
+
+    if (showCubeVertices) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        glEnable(GL_CULL_FACE);
+    }
 }
 
 void Cube::update(float t, float dt) {

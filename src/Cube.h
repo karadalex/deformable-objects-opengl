@@ -15,7 +15,7 @@ public:
     Cube(glm::vec3 pos, glm::vec3 vel, glm::vec3 omega, float length, float mass);
     ~Cube();
 
-    void draw(unsigned int drawable = 0);
+    void draw(bool showCubeVertices = false);
     void update(float t = 0, float dt = 0);
 };
 
