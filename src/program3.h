@@ -54,6 +54,19 @@ DeformableModel* deformableModel;
 // Standard acceleration due to gravity
 #define g 9.80665f
 
+// Simulation toggles
+bool showModelVertices = false;
+bool pausePhysics = false;
+
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_V && action == GLFW_PRESS) {
+        showModelVertices = !showModelVertices;
+    }
+    if (key == GLFW_KEY_P && action == GLFW_PRESS) {
+        pausePhysics = !pausePhysics;
+    }
+}
+
 void createContext() {
     shaderProgram = loadShaders("shaders/deformable.vert", "shaders/deformable.frag");
 
@@ -79,8 +92,6 @@ void mainLoop() {
     vec3 lightPos = vec3(10, 10, 10);
     camera->position = glm::vec3(0, 8, 30);
     float maxEnergy = 0;
-    bool showModelVertices = false;
-    bool pausePhysics = false;
 
     do {
         // calculate dt
@@ -106,14 +117,6 @@ void mainLoop() {
         plane->draw();
 
         handlePlaneModelCollision(*plane, *deformableModel);
-
-        // Simulation toggles
-        if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
-            showModelVertices = !showModelVertices;
-        }
-        if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS) {
-            pausePhysics = !pausePhysics;
-        }
 
         if (!pausePhysics) {
             deformableModel->update(t, dt);   
@@ -199,6 +202,9 @@ void initialize() {
 
     // Log
     logGLParameters();
+
+    // Simulation toggles
+    glfwSetKeyCallback(window, key_callback);
 
     // Create camera
     camera = new Camera(window);
