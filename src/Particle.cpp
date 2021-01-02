@@ -19,18 +19,21 @@ void Particle::update(float t, float dt) {
 
 
 void Particle::addNeighbor(Particle* neighbor, int type) {
+    vec3 p1p2 = x - neighbor->x;
+    float p1p2d = sqrt(p1p2.x*p1p2.x + p1p2.y*p1p2.y + p1p2.z*p1p2.z);
+
     switch (type) {
     case STRUCT_NEIGHBOR:
         structNeighbors.push_back(neighbor);
-        structDistances.push_back(x - neighbor->x);
+        structDistances.push_back(p1p2d);
         break;
     case SHEAR_NEIGHBOR:
         shearNeighbors.push_back(neighbor);
-        shearDistances.push_back(x - neighbor->x);
+        shearDistances.push_back(p1p2d);
         break;
     case BEND_NEIGHBOR:
         bendNeighbors.push_back(neighbor);
-        bendDistances.push_back(x - neighbor->x);
+        bendDistances.push_back(p1p2d);
         break;
     default:
         break;

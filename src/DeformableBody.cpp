@@ -88,10 +88,10 @@ void DeformableBody::update(float t, float dt) {
         //     vec3 p1p2 = prt1->x - prt2->x;
         //     float p1p2d = sqrt(p1p2.x*p1p2.x + p1p2.y*p1p2.y + p1p2.z*p1p2.z);
         //     vec3 unit_vec = p1p2 / p1p2d;
-        //     elastic += -k * (p1p2 - prt1->structDistances.at(j));
+        //     elastic += -k * (p1p2d - prt1->structDistances.at(j)) * unit_vec;
             
         //     vec3 vel = (dot(prt2->v, unit_vec) - dot(prt1->v, unit_vec)) * unit_vec;
-        //     damping += -b*vel;
+        //     damping += b*vel;
         // }
 
         vec3 force = gravity + elastic + damping;

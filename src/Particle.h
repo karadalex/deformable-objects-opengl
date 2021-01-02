@@ -28,9 +28,9 @@ public:
     vector<Particle*> structNeighbors, shearNeighbors, bendNeighbors;
     // Initial distances from neighbors (rest lengths)
     // these lists have a 1-1 correspondace with the particle lists above
-    vector<vec3> structDistances, shearDistances, bendDistances;
+    vector<float> structDistances, shearDistances, bendDistances;
     // Unit vectors connecting the neighbors
-    vector<vec3> structUnitVectors, shearUnitVectors, bendUnitVectors;
+    vector<float> structUnitVectors, shearUnitVectors, bendUnitVectors;
 
     /**
      * @brief Particle
