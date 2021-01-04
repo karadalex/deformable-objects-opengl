@@ -82,18 +82,18 @@ bool checkForSphereSphereCollision(glm::vec3& pos1, float& r1, glm::vec3& pos2, 
 
 /**
  * @brief handleStaircaseCubeCollision
- * @param plane
+ * @param staircase
  * @param cube
  */
-void handleStaircaseCubeCollision(Staircase& plane, Cube& cube);
+void handleStaircaseCubeCollision(Staircase& staircase, Cube& cube);
 
 /**
  * @brief checkForStaircaseCubeCollision
- * @param plane
+ * @param staircase
  * @param cube
  * @param n
  * @return
  */
-bool checkForStaircaseCubeCollision(Staircase& plane, Cube& cube, glm::vec3& n);
+bool checkForStaircaseCubeCollision(Staircase& staircase, Cube& cube, glm::vec3& n);
 
 #endif
