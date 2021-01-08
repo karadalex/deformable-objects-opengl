@@ -29,9 +29,19 @@ public:
      * @param dt
      */
     void update(float t = 0, float dt = 0);
+
+    /**
+     * @brief Get the particle that is associated with a specific vertex
+     * from indexed vertices
+     * @param index : THis is the index pointing to indexedVertices array inherited from the Drawable class
+     * @return Particle instance pointer
+     */
+    Particle* getVertexParticle(int index);
+
     ~DeformableBody();
 
     std::vector<Particle*> particleSystem;
+    std::vector<int> verticesToParticlesMap;
     int particlesNum;
     
     float k = 0.5; // stiffness
