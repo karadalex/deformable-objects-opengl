@@ -121,6 +121,7 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
         staircase->draw();
         
+        handleStaircaseCubeCollision(*staircase, *cube);
         handlePlaneCubeCollision(*plane, *cube);
 
         if (!pausePhysics) {
