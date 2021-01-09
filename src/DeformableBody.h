@@ -34,6 +34,7 @@ public:
      * @brief Get the particle that is associated with a specific vertex
      * from indexed vertices
      * @param index : THis is the index pointing to indexedVertices array inherited from the Drawable class
+     * @param prtPos
      * @return Particle instance pointer
      */
     Particle* getVertexParticle(int index, int &prtPos);

@@ -84,6 +84,39 @@ bool checkForPlaneParticleCollision(vec3& particle_pos, vec3& n) {
 }
 
 
+// TODO
+void handleStaircaseCubeCollision(Staircase& staircase, Cube& cube) {
+    for (int i = 0; i < cube.cube->particleSystem.size(); i++) {
+        vec3 n;
+        if (checkForStaircaseParticleCollision(staircase, cube.cube->particleSystem.at(i)->x, n)) {
+            // Define the velocity of the cube after the collision
+            cube.cube->particleSystem.at(i)->v = cube.cube->particleSystem.at(i)->v - 2.0f * dot(cube.cube->particleSystem.at(i)->v, n) * n;
+            cube.cube->particleSystem.at(i)->P = cube.cube->particleSystem.at(i)->v * cube.cube->particleSystem.at(i)->m;
+        }
+    }
+}
+
+
+// TODO
+bool checkForStaircaseParticleCollision(Staircase& staircase, vec3& p, vec3& n) {
+    for (int i = 0; i < staircase.staircase->indexedVertices.size(); i++) {
+        // Staircase vertex
+        vec3 st_v = staircase.staircase->indexedVertices.at(i);
+        if (p.y <= st_v.y && abs(p.x - st_v.x) <= 2.0f && abs(p.z - st_v.z) <= 2.0f ) {
+            //correction
+            cout << "staircase collision" << endl;
+            float dis = st_v.y - p.y;
+            p += vec3(0, dis, 0);
+            n = vec3(0, 1, 0.01);
+            return true;
+        }
+    }
+    cout << "no staircase collision" << endl;
+
+    return false;
+}
+
+
 void handleSphereSphereCollision(Sphere& sphere1, Sphere& sphere2)
 {
     vec3 n;
@@ -107,16 +140,4 @@ bool checkForSphereSphereCollision(vec3& pos1, float& r1, vec3& pos2, float& r2,
     {
 		return false;
     }   
-}
-
-
-// TODO
-void handleStaircaseCubeCollision(Staircase& staircase, Cube& cube) {
-    
-}
-
-
-// TODO
-bool checkForStaircaseCubeCollision(Staircase& staircase, Cube& cube, glm::vec3& n) {
-    return true;
 }
