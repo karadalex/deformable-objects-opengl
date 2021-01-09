@@ -16,6 +16,7 @@
 #include <common/shader.h>
 #include <common/util.h>
 #include <common/camera.h>
+#include <common/texture.h>
 
 #include "Collision.h"
 #include "Plane.h"
@@ -42,6 +43,12 @@ Camera* camera;
 GLuint shaderProgram;
 GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
 string selectedModelFile;
+
+// Texture variables
+string selectedTextureDir;
+GLuint useTexture;
+GLuint diffuseColorSampler, ambientColorSampler, normalSampler;
+GLuint diffuseTexture, ambientTexture, normalTexture;
 
 float stiffness, damping;
 
@@ -74,10 +81,24 @@ void createContext() {
     viewMatrixLocation = glGetUniformLocation(shaderProgram, "V");
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
+    // load diffuse, ambient and normal texture maps
+    string diffuseImg = selectedTextureDir + "/basecolor.png";
+    diffuseTexture = loadSOIL(diffuseImg.c_str());
+    string ambientOcclusionImg = selectedTextureDir + "/ambientOcclusion.png";
+    ambientTexture = loadSOIL(ambientOcclusionImg.c_str());
+    string normalImg = selectedTextureDir + "/normal.bmp";
+    normalTexture = loadSOIL(normalImg.c_str());
+
+    // get a pointer to the texture samplers (diffuseColorSampler, ambientColorSampler, normalSampler)
+    useTexture = glGetUniformLocation(shaderProgram, "useTexture");
+    diffuseColorSampler = glGetUniformLocation(shaderProgram, "diffuseColorSampler");
+    ambientColorSampler = glGetUniformLocation(shaderProgram, "ambientColorSampler");
+    normalSampler = glGetUniformLocation(shaderProgram, "normalSampler");
+
     plane = new Plane(8);
     float length = 0.1; 
     float mass = 10;
-    deformableModel = new DeformableModel(selectedModelFile, vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
+    deformableModel = new DeformableModel(selectedModelFile, vec3(0, 5, 0), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
 }
 
 void free() {
@@ -121,8 +142,26 @@ void mainLoop() {
         if (!pausePhysics) {
             deformableModel->update(t, dt);   
         }
+        
+        // bind textures and transmit diffuse and ambient maps to the GPU
+        glUniform1i(useTexture, 1);
+        
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, diffuseTexture);
+        glUniform1i(diffuseColorSampler, 0);
+
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, ambientTexture);
+        glUniform1i(ambientColorSampler, 1);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, normalTexture);
+        glUniform1i(normalSampler, 2);
+
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &deformableModel->modelMatrix[0][0]);
         deformableModel->draw(showModelVertices);
+
+        glUniform1i(useTexture, 0);
 
         // Calculate the total energy and comment on the previous
         // float KE = cube->calcKinecticEnergy();
@@ -214,6 +253,7 @@ int main(int argc, char* argv[]) {
     try {
         selectedModelFile = "models/" + selectObject();
         getElasticityParameters(stiffness, damping);
+        selectedTextureDir = "textures/" + selectModelTexture();
         
         initialize();
         createContext();

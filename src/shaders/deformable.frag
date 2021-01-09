@@ -9,7 +9,8 @@ in vec2 vertex_UV;
 uniform int useTexture = 0;
 uniform sampler2D diffuseColorSampler;
 uniform sampler2D specularColorSampler;
-uniform sampler2DShadow shadowMapSampler;
+uniform sampler2D ambientColorSampler;
+uniform sampler2D normalSampler;
 uniform mat4 V;
 
 // Phong
@@ -25,7 +26,7 @@ uniform Light light = Light(
     vec4(1, 1, 1, 1),
     vec4(1, 1, 1, 1),
     vec4(1, 1, 1, 1),
-    vec3(0, 4, 4),
+    vec3(0, 6, 4),
     20.0f
 );
 
@@ -59,9 +60,9 @@ void phong() {
     float _Ns = mtl.Ns;
     // use texture for materials
     if (useTexture == 1) {
-        _Ks = vec4(texture(specularColorSampler, vertex_UV).rgb, 1.0);
-        _Kd = vec4(texture(diffuseColorSampler, vertex_UV).rgb, 1.0);
-        _Ka = vec4(0.1, 0.1, 0.1, 1.0);
+        _Ks = vec4(0.1, 0.1, 0.1, 1.0);
+        _Kd = vec4(normalize(texture(diffuseColorSampler, vertex_UV).rgb), 1.0);
+        _Ka = vec4(normalize(texture(ambientColorSampler, vertex_UV).rgb), 1.0);
         _Ns = 10;
     }
 
@@ -70,8 +71,7 @@ void phong() {
 
     // model diffuse intensity (Id)
     vec3 N = normalize(vertex_normal_cameraspace);
-    vec3 L = normalize((V * vec4(light.lightPosition_worldspace, 1)).xyz
-        - vertex_position_cameraspace);
+    vec3 L = normalize((V * vec4(light.lightPosition_worldspace, 1)).xyz - vertex_position_cameraspace);
     float cosTheta = clamp(dot(L, N), 0, 1);
     vec4 Id = light.Ld * _Kd * cosTheta;
 
@@ -83,13 +83,18 @@ void phong() {
     vec4 Is = light.Ls * _Ks * specular_factor;
 
     //model the light distance effect
-    float distance = length(light.lightPosition_worldspace
-        - vertex_position_worldspace);
+    float distance = length(light.lightPosition_worldspace - vertex_position_worldspace);
     float distance_sq = distance * distance;
 
     // final fragment color
-    fragmentColor = vec4(
+    vec4 phongColor = vec4(
         Ia +
         Id * light.power / distance_sq +
         Is * light.power / distance_sq);
+    if (useTexture == 1) {
+        vec4 textureColor = vec4(normalize(texture(diffuseColorSampler, vertex_UV).rgb), 1.0);
+        fragmentColor = mix(phongColor, textureColor, 0.9);
+    } else {
+        fragmentColor = phongColor;
+    }
 }

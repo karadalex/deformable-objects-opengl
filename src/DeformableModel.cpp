@@ -38,7 +38,7 @@ void DeformableModel::update(float t, float dt) {
     // advanceState(t, dt);
 
     // compute model matrix
-    mat4 scale = glm::scale(mat4(), vec3(l, l, l));
-    mat4 tranlation = translate(mat4(), vec3(x.x, x.y, x.z));
-    modelMatrix = tranlation * scale;
+    // mat4 scale = glm::scale(mat4(), vec3(l, l, l));
+    // mat4 tranlation = translate(mat4(), vec3(x.x, x.y, x.z));
+    // modelMatrix = tranlation * scale;
 }
