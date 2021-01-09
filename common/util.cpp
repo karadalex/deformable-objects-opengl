@@ -116,3 +116,25 @@ void getElasticityParameters(float &stiffness, float &damping) {
     cout << "Set object's damping (e.g. 0.01):" << endl;
     cin >> damping;
 }
+
+
+std::string selectModelTexture() {
+    std::string obj_textures[6] = {
+		"Fabric_Wool_001",
+        "Leather_009",
+        "Metal_Tiles_003",
+        "Rubber_Sole_001",
+        "White_Marble_003",
+        "Wood_Herringbone_Tiles_003",
+	};
+	cout << "Select model texture (1-6): " << endl;
+    for (int i = 0; i < 6; i++) {
+		cout << i+1 << " " << obj_textures[i] << endl;
+	}
+	string texture_directory;
+	int ind;
+	cin >> ind;
+	texture_directory = obj_textures[ind - 1];
+    
+    return texture_directory;
+}

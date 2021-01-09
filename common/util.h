@@ -52,4 +52,11 @@ std::string selectObject();
  */ 
 void getElasticityParameters(float &stiffness, float &damping);
 
+
+/**
+ * Show list of available textures, slect texture and return directory name containing
+ * all texture's files
+ */
+std::string selectModelTexture();
+
 #endif
