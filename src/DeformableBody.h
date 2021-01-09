@@ -36,7 +36,7 @@ public:
      * @param index : THis is the index pointing to indexedVertices array inherited from the Drawable class
      * @return Particle instance pointer
      */
-    Particle* getVertexParticle(int index);
+    Particle* getVertexParticle(int index, int &prtPos);
 
     ~DeformableBody();
 

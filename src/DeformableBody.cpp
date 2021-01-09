@@ -53,16 +53,26 @@ DeformableBody::DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega,
         cout << "Particle " << i << " " << particle << endl;
     }
     cout << "Initialized Particle System with " << particlesNum << " particles" << endl;
+    cout << "Total number of indexed vertices: " << indexedVertices.size() << endl;
 
     // Setup structural neighbors
     // Add connections with previous and next vertices from the indexedVertices array
-    for (int i = 1; i < particlesNum-1; i++) {
-        particleSystem.at(i)->addNeighbor(particleSystem.at(i-1), STRUCT_NEIGHBOR);
-        particleSystem.at(i)->addNeighbor(particleSystem.at(i+1), STRUCT_NEIGHBOR);
+    for (int i = 0; i < indexedVertices.size()-3; i += 3) {
+        int p1Ind, p2Ind, p3Ind;
+        Particle *p1, *p2, *p3;
+        p1 = getVertexParticle(i, p1Ind);
+        p2 = getVertexParticle(i+1, p2Ind);
+        p3 = getVertexParticle(i+2, p3Ind);
+
+        particleSystem.at(p1Ind)->addNeighbor(particleSystem.at(p2Ind), STRUCT_NEIGHBOR);
+        particleSystem.at(p1Ind)->addNeighbor(particleSystem.at(p3Ind), STRUCT_NEIGHBOR);
+
+        particleSystem.at(p2Ind)->addNeighbor(particleSystem.at(p1Ind), STRUCT_NEIGHBOR);
+        particleSystem.at(p2Ind)->addNeighbor(particleSystem.at(p3Ind), STRUCT_NEIGHBOR);
+
+        particleSystem.at(p3Ind)->addNeighbor(particleSystem.at(p1Ind), STRUCT_NEIGHBOR);
+        particleSystem.at(p3Ind)->addNeighbor(particleSystem.at(p2Ind), STRUCT_NEIGHBOR);
     }
-    // Handle first and last vertices differently
-    particleSystem.at(0)->addNeighbor(particleSystem.at(1), STRUCT_NEIGHBOR);
-    particleSystem.at(particlesNum-1)->addNeighbor(particleSystem.at(particlesNum-2), STRUCT_NEIGHBOR);
 
     // Uncomment the following for testing purposes
     // Test that particle 1 has neighbors, and that changes in one neighbor are seen from the others
@@ -112,7 +122,7 @@ void DeformableBody::update(float t, float dt) {
         //         elastic += -k * (p1p2d - prt1->structDistances.at(j)) * unit_vec;
                 
         //         vec3 vel = (dot(prt2->v, unit_vec) - dot(prt1->v, unit_vec)) * unit_vec;
-        //         damping += b*vel;
+        //         damping += -b*vel;
         //     }
         // }
 
@@ -130,7 +140,8 @@ void DeformableBody::update(float t, float dt) {
 
     // Get new position of particle and save it in the vertex
     for (int i = 0; i < indexedVertices.size(); i++) {
-        Particle* particle = getVertexParticle(i);
+        int prtInd;
+        Particle* particle = getVertexParticle(i, prtInd);
         indexedVertices.at(i) = particle->x;
     }
     
@@ -141,8 +152,8 @@ void DeformableBody::update(float t, float dt) {
 }
 
 
-Particle* DeformableBody::getVertexParticle(int index) {
-    int particleIndex = verticesToParticlesMap.at(index);
+Particle* DeformableBody::getVertexParticle(int index, int &particleIndex) {
+    particleIndex = verticesToParticlesMap.at(index);
     // cout << "vertex " << index << " maps to particle " << particleIndex << endl;
     Particle* mappedParticle = particleSystem.at(particleIndex);
     return mappedParticle;
