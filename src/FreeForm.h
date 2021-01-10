@@ -29,8 +29,6 @@ public:
 
     void createContext();
 
-    void bind();
-
     /* Bind VAO before calling draw */
     void draw(int mode = GL_TRIANGLES);
 

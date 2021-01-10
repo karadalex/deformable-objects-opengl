@@ -171,7 +171,10 @@ void FreeForm::update(float t, float dt) {
   for (int i = 0; i < vertices.size(); i++) {
     vertices.at(i) = particleSystem.at(i)->x;
   }
+}
 
+
+void FreeForm::draw(int mode) {
   // Update Vertices with new positions
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(vec3), &vertices[0]);
@@ -182,4 +185,5 @@ void FreeForm::update(float t, float dt) {
   glDrawElements(GL_LINES, (GLuint)indices.size()*4, GL_UNSIGNED_INT, NULL);
   glBindVertexArray(0);
   glDisable(GL_DEPTH_TEST);
+
 }

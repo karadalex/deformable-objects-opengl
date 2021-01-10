@@ -127,11 +127,12 @@ void mainLoop() {
 
         if (!pausePhysics) {
             cube->update(t, dt);   
+            freeForm->update(t, dt);
         }
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
         // cube->draw(showModelVertices);
 
-        freeForm->update(t, dt);
+        freeForm->draw();
 
         // Collision checks
         handlePlaneCubeCollision(*plane, *cube);
