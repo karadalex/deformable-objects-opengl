@@ -54,6 +54,12 @@ void getElasticityParameters(float &stiffness, float &damping);
 
 
 /**
+ * Get model's mass from user's input
+ */ 
+float getMass();
+
+
+/**
  * Show list of available textures, slect texture and return directory name containing
  * all texture's files
  */

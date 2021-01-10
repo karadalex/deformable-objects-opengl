@@ -50,7 +50,7 @@ GLuint useTexture;
 GLuint diffuseColorSampler, ambientColorSampler, normalSampler;
 GLuint diffuseTexture, ambientTexture, normalTexture;
 
-float stiffness, damping;
+float stiffness, damping, mass;
 
 // Scene objects
 Plane* plane;
@@ -96,9 +96,10 @@ void createContext() {
     normalSampler = glGetUniformLocation(shaderProgram, "normalSampler");
 
     plane = new Plane(8);
-    float length = 0.1; 
-    float mass = 10;
-    deformableModel = new DeformableModel(selectedModelFile, vec3(0, 5, 0), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
+    float length = 0.1;
+    vec3 pos = vec3(0, 5, 0);
+    vec3 vel = vec3(0, -1, 0);
+    deformableModel = new DeformableModel(selectedModelFile, pos, vel, vec3(0, 0, 0), length, mass, stiffness, damping);
 }
 
 void free() {
@@ -253,6 +254,7 @@ int main(int argc, char* argv[]) {
     try {
         selectedModelFile = "models/" + selectObject();
         getElasticityParameters(stiffness, damping);
+        mass = getMass();
         selectedTextureDir = "textures/" + selectModelTexture();
         
         initialize();

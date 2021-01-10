@@ -118,6 +118,14 @@ void getElasticityParameters(float &stiffness, float &damping) {
 }
 
 
+float getMass() {
+    float mass;
+    cout << "Set object's mass in kg (e.g. 0.5):" << endl;
+    cin >> mass;
+    return mass;
+}
+
+
 std::string selectModelTexture() {
     std::string obj_textures[6] = {
 		"Fabric_Wool_001",
