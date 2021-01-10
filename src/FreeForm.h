@@ -1,6 +1,7 @@
 #ifndef FREE_FORM_H
 #define FREE_FORM_H
 
+#include "Grid3D.h"
 #include "Particle.h"
 #include <common/model.h>
 #include <vector>

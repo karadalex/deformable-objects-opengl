@@ -95,6 +95,8 @@ add_executable(deformable
   src/Particle.h
   src/FreeForm.cpp
   src/FreeForm.h
+  src/Grid3D.cpp
+  src/Grid3D.h
 
   src/RigidBody.cpp
   src/RigidBody.h
