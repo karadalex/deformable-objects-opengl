@@ -11,6 +11,8 @@
 using namespace std;
 using namespace glm;
 
+// Standard acceleration due to gravity
+#define g 9.80665f
 
 class FreeForm {
 public:
@@ -18,7 +20,12 @@ public:
     vector<vec3> vertices;
     vector<uvec4> indices;
 
-    FreeForm();
+    std::vector<Particle*> particleSystem; 
+    int particlesNum;   
+    float k = 0.5; // stiffness
+    float b = 0.01; // damping
+
+    FreeForm(vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
 
     void createContext();
 

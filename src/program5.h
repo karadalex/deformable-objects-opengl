@@ -81,7 +81,7 @@ void createContext() {
     float mass = 10;
     cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
 
-    freeForm = new FreeForm();
+    freeForm = new FreeForm(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
 }
 
 void free() {
@@ -123,18 +123,19 @@ void mainLoop() {
 
         staircase->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
-        staircase->draw();
-        
-        handlePlaneCubeCollision(*plane, *cube);
+        // staircase->draw();
 
         if (!pausePhysics) {
             cube->update(t, dt);   
         }
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
-        cube->draw(showModelVertices);
+        // cube->draw(showModelVertices);
 
         freeForm->update(t, dt);
 
+        // Collision checks
+        handlePlaneCubeCollision(*plane, *cube);
+        handlePlaneFreeFormCollision(*plane, *freeForm);
 
         // Calculate the total energy and comment on the previous
         // float KE = cube->calcKinecticEnergy();

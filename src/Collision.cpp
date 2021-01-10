@@ -70,6 +70,18 @@ bool handlePlaneModelCollision(Plane& plane, DeformableModel& model) {
 }
 
 
+bool handlePlaneFreeFormCollision(Plane& plane, FreeForm& model) {
+    for (int i = 0; i < model.particleSystem.size(); i++) {
+        vec3 n;
+        if (checkForPlaneParticleCollision(model.particleSystem.at(i)->x, n)) {
+            // Define the velocity of the model after the collision
+            model.particleSystem.at(i)->v = model.particleSystem.at(i)->v - 2.0f * dot(model.particleSystem.at(i)->v, n) * n;
+            model.particleSystem.at(i)->P = model.particleSystem.at(i)->v * model.particleSystem.at(i)->m;
+        }
+    }
+}
+
+
 bool checkForPlaneParticleCollision(vec3& particle_pos, vec3& n) {
     if (particle_pos.y <= 0) {
         //correction
