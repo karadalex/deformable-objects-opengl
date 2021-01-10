@@ -93,6 +93,8 @@ add_executable(deformable
   src/DeformableModel.h
   src/Particle.cpp
   src/Particle.h
+  src/FreeForm.cpp
+  src/FreeForm.h
 
   src/RigidBody.cpp
   src/RigidBody.h
