@@ -86,7 +86,7 @@ void createContext() {
     diffuseTexture = loadSOIL(diffuseImg.c_str());
     string ambientOcclusionImg = selectedTextureDir + "/ambientOcclusion.png";
     ambientTexture = loadSOIL(ambientOcclusionImg.c_str());
-    string normalImg = selectedTextureDir + "/normal.bmp";
+    string normalImg = selectedTextureDir + "/normal.png";
     normalTexture = loadSOIL(normalImg.c_str());
 
     // get a pointer to the texture samplers (diffuseColorSampler, ambientColorSampler, normalSampler)
