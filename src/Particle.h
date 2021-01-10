@@ -15,6 +15,9 @@ using namespace std;
 #define SHEAR_NEIGHBOR 1
 #define BEND_NEIGHBOR 2
 
+#define MINIMUM_PARTICLE_DISTANCE 0.001f
+#define MAXIMUM_PARTICLE_DISTANCE 1.0f
+
 
 class Particle : public RigidBody {
 public:

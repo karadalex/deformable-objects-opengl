@@ -1,7 +1,7 @@
 #include "Grid3D.h"
 
 
-Grid3D::Grid3D(Grid3DParams grid) {
+Grid3D::Grid3D(Grid3DParams grid) : grid(grid) {
   int n = grid.n;
   int m = grid.m;
   int l = grid.l;
@@ -48,4 +48,13 @@ Grid3D::Grid3D(Grid3DParams grid) {
 void Grid3D::getData(vector<vec3> &exportedVertices, vector<uvec4> exportedIndices) {
   for (auto v : vertices) exportedVertices.push_back(v);
   for (auto ind : indices) exportedIndices.push_back(ind);
+}
+
+
+int Grid3D::gridCoordsToInd(int i, int j, int k) {
+  int n = grid.n;
+  int m = grid.m;
+  int l = grid.l;
+  int index = k*m*n + j*n + i;
+  return index;
 }

@@ -24,10 +24,13 @@ class Grid3D {
 public:
     vector<vec3> vertices;
     vector<uvec4> indices;
+    Grid3DParams grid;
 
     Grid3D(Grid3DParams grid);
 
     void getData(vector<vec3> &exportedVertices, vector<uvec4> exportedIndices);
+
+    int gridCoordsToInd(int i, int j, int k);
 
     ~Grid3D();
 };
