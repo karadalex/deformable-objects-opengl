@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <string>
+#include <glm/glm.hpp>
 
 /* We can use a function like this to print some GL capabilities of our adapter
 to the log file. handy if we want to debug problems on other people's computers
@@ -64,5 +65,8 @@ float getMass();
  * all texture's files
  */
 std::string selectModelTexture();
+
+
+void printVec3(glm::vec3 v, const char *name = "Vector");
 
 #endif

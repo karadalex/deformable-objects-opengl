@@ -146,3 +146,7 @@ std::string selectModelTexture() {
     
     return texture_directory;
 }
+
+void printVec3(glm::vec3 v, const char *name) {
+    cout << name << " = (" << v.x << ", " << v.y << ", " << v.z << ")" << endl;
+}
