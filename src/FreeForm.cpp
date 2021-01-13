@@ -114,7 +114,7 @@ void FreeForm::update(float t, float dt) {
     vec3 gravity = vec3(0, -prt1->m * g, 0);
     
     // vec3 damping = -b*prt1->v; 
-    // vec3 elastic = -k*vec3(0, prt1->x.y, 0);
+    // vec3 elastic = -k0*vec3(0, prt1->x.y, 0);
     vec3 damping = vec3(0,0,0);
     vec3 elastic = vec3(0,0,0);
     for (int j = 0; j < prt1->structNeighbors.size(); j++) {
@@ -156,6 +156,11 @@ void FreeForm::update(float t, float dt) {
     }
 
     vec3 force = elastic + damping;
+    if (i == 0) {
+      // printVec3(gravity, "gravity");
+      printVec3(elastic, "elastic");
+      // printVec3(damping, "damping");
+    }
     prt1->forcing = [&](float t, const vector<float>& y)->vector<float> {
       vector<float> f(6, 0.0f);
       f[0] = force.x;

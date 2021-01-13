@@ -21,6 +21,7 @@
 #include "Plane.h"
 #include "Cube.h"
 #include "Staircase.h"
+#include "FreeForm.h"
 
 namespace program2 {
 
@@ -49,6 +50,7 @@ float stiffness, damping;
 Plane* plane;
 Cube* cube;
 Staircase* staircase;
+FreeForm* freeForm;
 
 // Standard acceleration due to gravity
 #define g 9.80665f
@@ -78,6 +80,8 @@ void createContext() {
     float length = 1; 
     float mass = 10;
     cube = new Cube(vec3(0, 10, -5), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
+
+    freeForm = new FreeForm(vec3(0, 10, -5), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
 }
 
 void free() {
@@ -120,16 +124,20 @@ void mainLoop() {
         staircase->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
         staircase->draw();
-        
-        handleStaircaseCubeCollision(*staircase, *cube);
-        handlePlaneCubeCollision(*plane, *cube);
 
         if (!pausePhysics) {
             cube->update(t, dt);   
+            freeForm->update(t, dt);
         }
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
-        cube->draw(showModelVertices);
+        // cube->draw(showModelVertices);
 
+        freeForm->draw();
+
+        handleStaircaseCubeCollision(*staircase, *cube);
+        handlePlaneCubeCollision(*plane, *cube);
+        handlePlaneFreeFormCollision(*plane, *freeForm);
+        handleStaircaseFreeFormCollision(*staircase, *freeForm);
 
         // Calculate the total energy and comment on the previous
         // float KE = cube->calcKinecticEnergy();

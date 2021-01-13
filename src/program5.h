@@ -81,7 +81,7 @@ void createContext() {
     float mass = 10;
     cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
 
-    freeForm = new FreeForm(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
+    freeForm = new FreeForm(vec3(4, 5, 4), vec3(0, -2, 0), vec3(0, 0, 0), mass, stiffness, damping);
 }
 
 void free() {

@@ -90,6 +90,8 @@ bool checkForSphereSphereCollision(glm::vec3& pos1, float& r1, glm::vec3& pos2, 
  */
 void handleStaircaseCubeCollision(Staircase& staircase, Cube& cube);
 
+void handleStaircaseFreeFormCollision(Staircase& staircase, FreeForm& model) ;
+
 /**
  * @brief checkForStaircaseParticleCollision
  * @param staircase

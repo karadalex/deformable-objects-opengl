@@ -7,6 +7,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <common/util.h>
 
 using namespace std;
 using namespace glm;

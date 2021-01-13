@@ -75,15 +75,15 @@ bool handlePlaneFreeFormCollision(Plane& plane, FreeForm& model) {
         vec3 n;
         if (checkForPlaneParticleCollision(model.particleSystem.at(i)->x, n)) {
             // Define the velocity of the model after the collision
-            model.particleSystem.at(i)->v = model.particleSystem.at(i)->v - 2.0f * dot(model.particleSystem.at(i)->v, n) * n;
-            model.particleSystem.at(i)->P = model.particleSystem.at(i)->v * model.particleSystem.at(i)->m;
+            model.particleSystem.at(i)->v = (model.particleSystem.at(i)->v - 2.0f * dot(model.particleSystem.at(i)->v, n) * n) * (1.0f/(float)model.particlesNum);
+            model.particleSystem.at(i)->P = model.particleSystem.at(i)->v * model.particleSystem.at(i)->m * (1.0f/(float)model.particlesNum);
         }
     }
 }
 
 
 bool checkForPlaneParticleCollision(vec3& particle_pos, vec3& n) {
-    if (particle_pos.y <= 0) {
+    if (particle_pos.y < 0) {
         //correction
         float dis = -particle_pos.y;
         particle_pos += vec3(0, dis, 0);
@@ -104,6 +104,17 @@ void handleStaircaseCubeCollision(Staircase& staircase, Cube& cube) {
             // Define the velocity of the cube after the collision
             cube.cube->particleSystem.at(i)->v = cube.cube->particleSystem.at(i)->v - 2.0f * dot(cube.cube->particleSystem.at(i)->v, n) * n;
             cube.cube->particleSystem.at(i)->P = cube.cube->particleSystem.at(i)->v * cube.cube->particleSystem.at(i)->m;
+        }
+    }
+}
+
+void handleStaircaseFreeFormCollision(Staircase& staircase, FreeForm& model) {
+    for (int i = 0; i < model.particleSystem.size(); i++) {
+        vec3 n;
+        if (checkForStaircaseParticleCollision(staircase, model.particleSystem.at(i)->x, n)) {
+            // Define the velocity of the model after the collision
+            model.particleSystem.at(i)->v = model.particleSystem.at(i)->v - 2.0f * dot(model.particleSystem.at(i)->v, n) * n;
+            model.particleSystem.at(i)->P = model.particleSystem.at(i)->v * model.particleSystem.at(i)->m;
         }
     }
 }
@@ -152,4 +163,29 @@ bool checkForSphereSphereCollision(vec3& pos1, float& r1, vec3& pos2, float& r2,
     {
 		return false;
     }   
+}
+
+
+void handleParticleParticleCollision(Plane& plane, Sphere& sphere) {
+    vec3 n;
+    if (checkForPlaneSphereCollision(sphere.x, sphere.r, plane.size, n)) {
+        // Define the velocity of the sphere after the collision
+		sphere.v = sphere.v -2.0f * dot(sphere.v, n) * n;
+		sphere.P = sphere.v * sphere.m;
+    }
+}
+
+
+bool checkForParticleParticleCollision(vec3& pos, const float& r, const float& size, vec3& n) {
+    bool insideXZ = true; // TODO: Check if sphere is inside XZ plane
+    if (pos.y - r <= 0 && insideXZ) {
+        //correction
+        float dis = -(pos.y - r);
+        pos = pos + vec3(0, dis, 0);
+
+        n = vec3(0, -1, 0);
+    } else {
+        return false;
+    }
+    return true;
 }
