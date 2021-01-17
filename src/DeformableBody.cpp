@@ -12,16 +12,6 @@ using namespace std;
 DeformableBody::DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega, float mass, float stiffness, float damping) : Drawable(path) {
     k = stiffness;
     b = damping;
-    
-    if (path.substr(path.size() - 3, 3) == "obj") {
-        loadOBJWithTiny(path.c_str(), vertices, uvs, normals, VEC_UINT_DEFAUTL_VALUE);
-    } else if (path.substr(path.size() - 3, 3) == "vtp") {
-        loadVTP(path.c_str(), vertices, uvs, normals, VEC_UINT_DEFAUTL_VALUE);
-    } else {
-        throw runtime_error("File format not supported: " + path);
-    }
-
-    createContext();
 
     // Create array of unique, non-repeated vertices and map them to the indexedVertices
     vector<vec3> uniqueVertices;
@@ -57,12 +47,16 @@ DeformableBody::DeformableBody(std::string path, vec3 pos, vec3 vel, vec3 omega,
 
     // Setup structural neighbors
     // Add connections with previous and next vertices from the indexedVertices array
-    for (int i = 0; i < indexedVertices.size()-3; i += 3) {
+    for (int i = 0; i < indices.size()-2; i += 3) {
+        int ind1, ind2, ind3;
+        ind1 = indices.at(i);
+        ind2 = indices.at(i+1);
+        ind3 = indices.at(i+2);
         int p1Ind, p2Ind, p3Ind;
         Particle *p1, *p2, *p3;
-        p1 = getVertexParticle(i, p1Ind);
-        p2 = getVertexParticle(i+1, p2Ind);
-        p3 = getVertexParticle(i+2, p3Ind);
+        p1 = getVertexParticle(ind1, p1Ind);
+        p2 = getVertexParticle(ind2, p2Ind);
+        p3 = getVertexParticle(ind3, p3Ind);
 
         particleSystem.at(p1Ind)->addNeighbor(particleSystem.at(p2Ind), STRUCT_NEIGHBOR);
         particleSystem.at(p1Ind)->addNeighbor(particleSystem.at(p3Ind), STRUCT_NEIGHBOR);
@@ -109,22 +103,20 @@ void DeformableBody::update(float t, float dt) {
             0
         );
         
-        vec3 damping = -b*prt1->v; 
-        vec3 elastic = -k*vec3(0, prt1->x.y, 0);
-        // vec3 damping = vec3(0,0,0);
-        // vec3 elastic = vec3(0,0,0);
-        // for (int j = 0; j < prt1->structNeighbors.size(); j++) {
-        //     Particle* prt2 = prt1->structNeighbors.at(j);
-        //     vec3 p1p2 = prt1->x - prt2->x;
-        //     float p1p2d = sqrt(p1p2.x*p1p2.x + p1p2.y*p1p2.y + p1p2.z*p1p2.z);
-        //     if (p1p2d >= 0.0000001f) {
-        //         vec3 unit_vec = p1p2 / p1p2d;
-        //         elastic += -k * (p1p2d - prt1->structDistances.at(j)) * unit_vec;
-                
-        //         vec3 vel = (dot(prt2->v, unit_vec) - dot(prt1->v, unit_vec)) * unit_vec;
-        //         damping += -b*vel;
-        //     }
-        // }
+        // vec3 damping = -b*prt1->v; 
+        // vec3 elastic = -k*vec3(0, prt1->x.y, 0);
+        vec3 damping = vec3(0,0,0);
+        vec3 elastic = vec3(0,0,0);
+        for (int j = 0; j < prt1->structNeighbors.size(); j++) {
+            Particle* prt2 = prt1->structNeighbors.at(j);
+            vec3 p1p2 = prt1->x - prt2->x;
+            float p1p2d = sqrt(p1p2.x*p1p2.x + p1p2.y*p1p2.y + p1p2.z*p1p2.z);
+            vec3 unit_vec = p1p2 / p1p2d;
+            elastic += -k * (p1p2d - prt1->structDistances.at(j)) * unit_vec;
+            
+            vec3 vel = (dot(prt1->v, unit_vec) - dot(prt2->v, unit_vec)) * unit_vec;
+            damping += -b*vel;
+        }
 
         vec3 force = gravity + elastic + damping;
         prt1->forcing = [&](float t, const vector<float>& y)->vector<float> {
