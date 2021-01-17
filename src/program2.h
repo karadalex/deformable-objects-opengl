@@ -50,7 +50,6 @@ float stiffness, damping;
 Plane* plane;
 Cube* cube;
 Staircase* staircase;
-FreeForm* freeForm;
 
 // Standard acceleration due to gravity
 #define g 9.80665f
@@ -80,8 +79,6 @@ void createContext() {
     float length = 1; 
     float mass = 10;
     cube = new Cube(vec3(0, 10, -5), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
-
-    freeForm = new FreeForm(vec3(0, 10, -5), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
 }
 
 void free() {
@@ -126,17 +123,12 @@ void mainLoop() {
         staircase->draw();
 
         if (!pausePhysics) {
-            cube->update(t, dt);   
-            freeForm->update(t, dt);
+            cube->update(t, dt);
         }
         cube->draw();
 
-        freeForm->draw();
-
         handleStaircaseCubeCollision(*staircase, *cube);
         handlePlaneCubeCollision(*plane, *cube);
-        handlePlaneFreeFormCollision(*plane, *freeForm);
-        handleStaircaseFreeFormCollision(*staircase, *freeForm);
 
         // Calculate the total energy and comment on the previous
         // float KE = cube->calcKinecticEnergy();
