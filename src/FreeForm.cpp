@@ -124,8 +124,8 @@ void FreeForm::update(float t, float dt) {
       vec3 unit_vec = p1p2 / p1p2d;
       elastic += -k0 * (p1p2d - prt1->structDistances.at(j)) * unit_vec;
       
-      vec3 vel = (dot(prt2->v, unit_vec) - dot(prt1->v, unit_vec)) * unit_vec;
-      damping += b*vel;
+      vec3 vel = (dot(prt1->v, unit_vec) - dot(prt2->v, unit_vec)) * unit_vec;
+      damping += -b*vel;
 
       // Disable gravity if particles are in rest
       // if (p1p2d - prt1->structDistances.at(j) <= 0.0001f) {
@@ -140,8 +140,8 @@ void FreeForm::update(float t, float dt) {
       vec3 unit_vec = p1p2 / p1p2d;
       elastic += -k0 * (p1p2d - prt1->shearDistances.at(j)) * unit_vec;
       
-      vec3 vel = (dot(prt2->v, unit_vec) - dot(prt1->v, unit_vec)) * unit_vec;
-      damping += b*vel;
+      vec3 vel = (dot(prt1->v, unit_vec) - dot(prt2->v, unit_vec)) * unit_vec;
+      damping += -b*vel;
     }
 
     for (int j = 0; j < prt1->bendNeighbors.size(); j++) {
@@ -151,13 +151,13 @@ void FreeForm::update(float t, float dt) {
       vec3 unit_vec = p1p2 / p1p2d;
       elastic += -k0 * (p1p2d - prt1->bendDistances.at(j)) * unit_vec;
       
-      vec3 vel = (dot(prt2->v, unit_vec) - dot(prt1->v, unit_vec)) * unit_vec;
-      damping += b*vel;
+      vec3 vel = (dot(prt1->v, unit_vec) - dot(prt2->v, unit_vec)) * unit_vec;
+      damping += -b*vel;
     }
 
-    vec3 force = elastic + damping;
+    vec3 force = gravity + elastic + damping;
     if (i == 0) {
-      // printVec3(gravity, "gravity");
+      printVec3(gravity, "gravity");
       printVec3(elastic, "elastic");
       // printVec3(damping, "damping");
     }
