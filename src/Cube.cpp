@@ -100,6 +100,20 @@ Cube::Cube(vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, flo
           particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j,k+2)), BEND_NEIGHBOR);
         if (k > 1)
           particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j,k-2)), BEND_NEIGHBOR);
+
+        // Diagonal bending neighbors
+        if (i < gridParams.n-2 && j < gridParams.m-2)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i+2,j+2,k)), BEND_NEIGHBOR);
+        if (i > 1 && j > 1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i-2,j-2,k)), BEND_NEIGHBOR);
+        if (j < gridParams.m-2 && k < gridParams.l-2)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j+2,k+2)), BEND_NEIGHBOR);
+        if (j > 1 && k > 1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j-2,k-2)), BEND_NEIGHBOR);
+        if (i < gridParams.n-2 && k < gridParams.l-2)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i+2,j,k+2)), BEND_NEIGHBOR);
+        if (i > 1 && k > 1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i-2,j,k-2)), BEND_NEIGHBOR);
       }
     }
   }
@@ -156,11 +170,11 @@ void Cube::update(float t, float dt) {
     }
 
     vec3 force = elastic + damping;
-    if (i == 0) {
-      printVec3(gravity, "gravity");
-      printVec3(elastic, "elastic");
-      // printVec3(damping, "damping");
-    }
+    // if (i == 0) {
+    //   printVec3(gravity, "gravity");
+    //   printVec3(elastic, "elastic");
+    //   printVec3(damping, "damping");
+    // }
     prt1->forcing = [&](float t, const vector<float>& y)->vector<float> {
       vector<float> f(6, 0.0f);
       f[0] = force.x;
