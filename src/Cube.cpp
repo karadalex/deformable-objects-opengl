@@ -1,234 +1,198 @@
 #include "Cube.h"
-#include <glm/gtc/matrix_transform.hpp>
-#include <common/model.h>
-#include <iostream>
 
-using namespace glm;
 
-Cube::Cube(vec3 pos, vec3 vel, vec3 omega, float length, float mass, float stiffness, float damping) : RigidBody() {
-    cube = new DeformableBody("models/cube.obj", pos, vel, omega, mass, stiffness, damping);
+Cube::Cube(vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping) {
+  k0 = stiffness;
+  b = damping;
 
-    l = length;
-    m = mass;
-    x = pos;
-    v = vel;
-    P = m * v;
-    w = omega;
+  Grid3DParams gridParams;
+  gridParams.width = 5.0f;
+  gridParams.height = 5.0f;
+  gridParams.depth = 5.0f;
+  gridParams.n = 5;
+  gridParams.m = 5;
+  gridParams.l = 5;
+  gridParams.position = position;
+  Grid3D* grid = new Grid3D(gridParams);
+  for (vec3 v : grid->vertices) vertices.push_back(v);
+  for (uvec4 ind : grid->indices) indices.push_back(ind);
 
-    if (l == 0) throw std::logic_error("Cube: length != 0");
-    mat3 I = mat3(
-        1.0f / 6 * mass * l * l, 0, 0,
-        0, 1.0f / 6 * mass * l * l, 0,
-        0, 0, 1.0f / 6 * mass * l * l);
+  glGenVertexArrays(1, &VAO);
+  glBindVertexArray(VAO);
 
-    L = I * w;
-    I_inv = inverse(I);
-}
+  glGenBuffers(1, &VBO);
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferData(GL_ARRAY_BUFFER, vertices.size()*sizeof(vec3), &vertices[0], GL_STATIC_DRAW);
+  glEnableVertexAttribArray(0);
+  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-Cube::~Cube() {
-    delete cube;
-}
+  glGenBuffers(1, &EBO);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(uvec4), &indices[0], GL_STATIC_DRAW);
 
-void Cube::draw(bool showCubeVertices) {
-    if (showCubeVertices) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glDisable(GL_CULL_FACE);    
+  glBindVertexArray(0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+  particlesNum = vertices.size();
+  float particleMass = mass / particlesNum;
+  // Assign a Particle to each vertex
+  for (int i = 0; i < vertices.size(); i++) {
+    vec3 vertex = vertices.at(i);
+    Particle* particle = new Particle(vertex, vel, particleMass);
+    particleSystem.push_back(particle);
+  }
+  
+  // Setup structural neighbors
+  // Add connections with previous and next vertices from the particleSystem array
+  for (int k = 0; k < gridParams.l; k++) {    
+    for(int j = 0; j < gridParams.m; j++) {
+      for(int i = 0; i < gridParams.n; i++) { 
+        if (i < gridParams.n-1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i+1,j,k)), STRUCT_NEIGHBOR);
+        if (i > 0)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i-1,j,k)), STRUCT_NEIGHBOR);
+        if (j < gridParams.m-1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j+1,k)), STRUCT_NEIGHBOR);
+        if (j > 0)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j-1,k)), STRUCT_NEIGHBOR);
+        if (k < gridParams.l-1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j,k+1)), STRUCT_NEIGHBOR);
+        if (k > 0)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j,k-1)), STRUCT_NEIGHBOR);
+      }
     }
-    
-    cube->bind();
-    cube->draw();
+  }
 
-    if (showCubeVertices) {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glEnable(GL_CULL_FACE);
+  // Setup shear neighbors
+  for (int k = 0; k < gridParams.l; k++) {    
+    for(int j = 0; j < gridParams.m; j++) {
+      for(int i = 0; i < gridParams.n; i++) { 
+        if (i < gridParams.n-1 && j < gridParams.m-1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i+1,j+1,k)), SHEAR_NEIGHBOR);
+        if (i > 0 && j > 0)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i-1,j-1,k)), SHEAR_NEIGHBOR);
+        if (j < gridParams.m-1 && k < gridParams.l-1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j+1,k+1)), SHEAR_NEIGHBOR);
+        if (j > 0 && k > 0)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j-1,k-1)), SHEAR_NEIGHBOR);
+        if (i < gridParams.n-1 && k < gridParams.l-1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i+1,j,k+1)), SHEAR_NEIGHBOR);
+        if (i > 0 && k > 0)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i-1,j,k-1)), SHEAR_NEIGHBOR);
+      }
     }
+  }
+
+  // Setup bending neighbors
+  for (int k = 0; k < gridParams.l; k++) {    
+    for(int j = 0; j < gridParams.m; j++) {
+      for(int i = 0; i < gridParams.n; i++) { 
+        if (i < gridParams.n-2)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i+2,j,k)), BEND_NEIGHBOR);
+        if (i > 1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i-2,j,k)), BEND_NEIGHBOR);
+        if (j < gridParams.m-2)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j+2,k)), BEND_NEIGHBOR);
+        if (j > 1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j-2,k)), BEND_NEIGHBOR);
+        if (k < gridParams.l-2)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j,k+2)), BEND_NEIGHBOR);
+        if (k > 1)
+          particleSystem.at(grid->gridCoordsToInd(i,j,k))->addNeighbor(particleSystem.at(grid->gridCoordsToInd(i,j,k-2)), BEND_NEIGHBOR);
+      }
+    }
+  }
+  
 }
 
 void Cube::update(float t, float dt) {
-    cube->update(t, dt);
+  for (int i = 0; i < particlesNum; i++) {
+    Particle* prt1 = particleSystem.at(i);
+    // TODO: Calculate total force for particle:
+    // Forces: gravity, spring-damp, shear, bending, collision
+    vec3 gravity = vec3(0, -prt1->m * g, 0);
+    
+    // vec3 damping = -b*prt1->v; 
+    // vec3 elastic = -k0*vec3(0, prt1->x.y, 0);
+    vec3 damping = vec3(0,0,0);
+    vec3 elastic = vec3(0,0,0);
+    for (int j = 0; j < prt1->structNeighbors.size(); j++) {
+      Particle* prt2 = prt1->structNeighbors.at(j);
+      vec3 p1p2 = prt1->x - prt2->x;
+      float p1p2d = sqrt(p1p2.x*p1p2.x + p1p2.y*p1p2.y + p1p2.z*p1p2.z);
+      vec3 unit_vec = p1p2 / p1p2d;
+      elastic += -k0 * (p1p2d - prt1->structDistances.at(j)) * unit_vec;
+      
+      vec3 vel = (dot(prt1->v, unit_vec) - dot(prt2->v, unit_vec)) * unit_vec;
+      damping += -b*vel;
 
-    // numerical integration
-    // advanceState(t, dt);
+      // Disable gravity if particles are in rest
+      // if (p1p2d - prt1->structDistances.at(j) <= 0.0001f) {
+      //   gravity = vec3(0,0,0);
+      // } 
+    }
 
-    // compute model matrix
-//     mat4 scale = glm::scale(mat4(), vec3(l, l, l));
-//     mat4 tranlation = translate(mat4(), vec3(x.x, x.y, x.z));
-// #ifdef USE_QUATERNIONS
-//     mat4 rotation = mat4_cast(q);
-// #else
-//     mat4 rotation = mat4(R);
-// #endif
-//     modelMatrix = tranlation * rotation * scale;
+    for (int j = 0; j < prt1->shearNeighbors.size(); j++) {
+      Particle* prt2 = prt1->shearNeighbors.at(j);
+      vec3 p1p2 = prt1->x - prt2->x;
+      float p1p2d = sqrt(p1p2.x*p1p2.x + p1p2.y*p1p2.y + p1p2.z*p1p2.z);
+      vec3 unit_vec = p1p2 / p1p2d;
+      elastic += -k0 * (p1p2d - prt1->shearDistances.at(j)) * unit_vec;
+      
+      vec3 vel = (dot(prt1->v, unit_vec) - dot(prt2->v, unit_vec)) * unit_vec;
+      damping += -b*vel;
+    }
+
+    for (int j = 0; j < prt1->bendNeighbors.size(); j++) {
+      Particle* prt2 = prt1->bendNeighbors.at(j);
+      vec3 p1p2 = prt1->x - prt2->x;
+      float p1p2d = sqrt(p1p2.x*p1p2.x + p1p2.y*p1p2.y + p1p2.z*p1p2.z);
+      vec3 unit_vec = p1p2 / p1p2d;
+      elastic += -k0 * (p1p2d - prt1->bendDistances.at(j)) * unit_vec;
+      
+      vec3 vel = (dot(prt1->v, unit_vec) - dot(prt2->v, unit_vec)) * unit_vec;
+      damping += -b*vel;
+    }
+
+    vec3 force = elastic + damping;
+    if (i == 0) {
+      printVec3(gravity, "gravity");
+      printVec3(elastic, "elastic");
+      // printVec3(damping, "damping");
+    }
+    prt1->forcing = [&](float t, const vector<float>& y)->vector<float> {
+      vector<float> f(6, 0.0f);
+      f[0] = force.x;
+      f[1] = force.y;
+      f[2] = force.z;
+      return f;
+    };
+    // Update particle's physics state
+    prt1->update(t, dt);
+  }
+
+  // Get new position of particle and save it in the vertex
+  for (int i = 0; i < vertices.size(); i++) {
+    vertices.at(i) = particleSystem.at(i)->x;
+  }
 }
 
 
-// OLD CODE
-// void CubeCustom::createContext()
-// {
+void Cube::draw(int mode) {
+  // Update Vertices with new positions
+  glBindBuffer(GL_ARRAY_BUFFER, VBO);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(vec3), &vertices[0]);
 
-//     // Get a pointer location to model matrix in the vertex shader
-//     MVPLocation = glGetUniformLocation(shaderProgram, "MVP");
+  // Draw grid
+  glEnable(GL_DEPTH_TEST);
+  glBindVertexArray(VAO);
+  glDrawElements(GL_LINES, (GLuint)indices.size()*4, GL_UNSIGNED_INT, NULL);
+  glBindVertexArray(0);
+  glDisable(GL_DEPTH_TEST);
+}
 
-//     // Define cube VAO
-//     glGenVertexArrays(1, &cubeVAO);
-//     glBindVertexArray(cubeVAO);
 
-//     // Define cube vertices. Three consecutive floats give a 3D vertex; Three
-//     // consecutive vertices give a triangle.
-//     GLfloat range[2] = {-1.0f, 1.0f};
-//     GLfloat step = 2.0f/density;
-//     GLfloat x, y, z;
-//     for (int r = 0; r < 2; r++)
-//     {
-//         x = range[r];
-//         for (int j = 0; j < density; j++)
-//         {
-//             for (int k = 0; k < density; k++)
-//             {
-//                 // 1st triangle
-//                 y = range[0] + j*step;
-//                 z = range[0] + k*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 z = range[0] + (k+1)*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 y = range[0] + (j+1)*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-
-//                 // 2nd triangle
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 z = range[0] + k*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 y = range[0] + j*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//             }
-//         }
-//     }
-//     for (int r = 0; r < 2; r++)
-//     {
-//         y = range[r];
-//         for (int i = 0; i < density; i++)
-//         {
-//             for (int k = 0; k < density; k++)
-//             {
-//                 // 1st triangle
-//                 x = range[0] + i*step;
-//                 z = range[0] + k*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 z = range[0] + (k+1)*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 x = range[0] + (i+1)*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-
-//                 // 2nd triangle
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 z = range[0] + k*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 x = range[0] + i*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//             }
-//         }
-//     }
-//     for (int r = 0; r < 2; r++)
-//     {
-//         z = range[r];
-//         for (int i = 0; i < density; i++)
-//         {
-//             for (int j = 0; j < density; j++)
-//             {
-//                 // 1st triangle
-//                 x = range[0] + i*step;
-//                 y = range[0] + j*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 y = range[0] + (j+1)*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 x = range[0] + (i+1)*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-
-//                 // 2nd triangle
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 y = range[0] + j*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//                 x = range[0] + i*step;
-//                 cubeVertices.push_back(x); cubeVertices.push_back(y); cubeVertices.push_back(z);
-//             }
-//         }
-//     }
-
-//     glGenBuffers(1, &cubeVerticesVBO);
-//     glBindBuffer(GL_ARRAY_BUFFER, cubeVerticesVBO);
-//     glBufferData(GL_ARRAY_BUFFER, cubeVertices.size() * sizeof(GLfloat), static_cast<void *>(cubeVertices.data()), GL_STATIC_DRAW);
-//     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-//     glEnableVertexAttribArray(0);
-
-//     // color VBO
-//     vector<GLfloat> cubeColors;
-//     vector<GLfloat> faceColors = {
-//         0.583f, 0.771f, 0.014f,
-//         0.609f, 0.115f, 0.436f,
-//         0.327f, 0.483f, 0.844f,
-
-//         0.583f, 0.771f, 0.014f,
-//         0.609f, 0.115f, 0.436f,
-//         0.327f, 0.483f, 0.844f
-//     };
-//     for (int r = 0; r < 2; r++)
-//     {
-//         x = range[r];
-//         for (int j = 0; j < density; j++)
-//         {
-//             for (int k = 0; k < density; k++)
-//             {
-//                 cubeColors.insert(cubeColors.end(), faceColors.begin(), faceColors.end());
-//             }
-//         }
-//     }
-//     faceColors = {
-//         0.597f, 0.770f, 0.761f,
-//         0.559f, 0.436f, 0.730f,
-//         0.359f, 0.583f, 0.152f,
-
-//         0.483f, 0.596f, 0.789f,
-//         0.559f, 0.861f, 0.639f,
-//         0.195f, 0.548f, 0.859f
-//     };
-//     for (int r = 0; r < 2; r++)
-//     {
-//         y = range[r];
-//         for (int i = 0; i < density; i++)
-//         {
-//             for (int k = 0; k < density; k++)
-//             {
-//                 cubeColors.insert(cubeColors.end(), faceColors.begin(), faceColors.end());
-//             }
-//         }
-//     }
-//     faceColors = {
-//         0.014f, 0.184f, 0.576f,
-//         0.771f, 0.328f, 0.970f,
-//         0.406f, 0.615f, 0.116f,
-
-//         0.676f, 0.977f, 0.133f,
-//         0.971f, 0.572f, 0.833f,
-//         0.140f, 0.616f, 0.489f
-//     };
-//     for (int r = 0; r < 2; r++)
-//     {
-//         z = range[r];
-//         for (int i = 0; i < density; i++)
-//         {
-//             for (int j = 0; j < density; j++)
-//             {
-//                 cubeColors.insert(cubeColors.end(), faceColors.begin(), faceColors.end());
-//             }
-//         }
-//     }
-
-//     glGenBuffers(1, &cubeColorsVBO);
-//     glBindBuffer(GL_ARRAY_BUFFER, cubeColorsVBO);
-//     glBufferData(GL_ARRAY_BUFFER, cubeColors.size() * sizeof(GLfloat), static_cast<void *>(cubeColors.data()), GL_STATIC_DRAW);
-//     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-//     glEnableVertexAttribArray(1);
-
-//     cout << "cubevertices " << cubeVertices.size() << endl;
-//     cout << "cubecolors " << cubeColors.size() << endl;
-// }
+Cube::~Cube() {
+    
+}

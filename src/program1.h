@@ -20,6 +20,8 @@
 #include "Collision.h"
 #include "Plane.h"
 #include "Cube.h"
+#include "Staircase.h"
+#include "FreeForm.h"
 
 namespace program1 {
 
@@ -34,7 +36,7 @@ void free();
 
 #define W_WIDTH 1024
 #define W_HEIGHT 768
-#define TITLE "Experiment 1 - Deformable cube"
+#define TITLE "Experiment 1 - Free-form deformation of objectst"
 
 // Global variables
 GLFWwindow* window;
@@ -47,6 +49,7 @@ float stiffness, damping;
 // Scene objects
 Plane* plane;
 Cube* cube;
+Staircase* staircase;
 
 // Standard acceleration due to gravity
 #define g 9.80665f
@@ -72,13 +75,14 @@ void createContext() {
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
     plane = new Plane(8);
-    float length = 1; 
+    staircase = new Staircase(1);
     float mass = 10;
-    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
+    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
 }
 
 void free() {
     delete plane;
+    delete staircase;
     delete cube;
     glDeleteProgram(shaderProgram);
     glfwTerminate();
@@ -112,14 +116,18 @@ void mainLoop() {
         plane->update(t, dt);
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
-        
-        handlePlaneCubeCollision(*plane, *cube);
+
+        staircase->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
+        // staircase->draw();
 
         if (!pausePhysics) {
-            cube->update(t, dt);   
+            cube->update(t, dt);
         }
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
-        cube->draw(showModelVertices);
+        cube->draw();
+
+        // Collision checks
+        handlePlaneCubeCollision(*plane, *cube);
 
         // Calculate the total energy and comment on the previous
         // float KE = cube->calcKinecticEnergy();
@@ -210,7 +218,7 @@ void initialize() {
 int main(int argc, char* argv[]) {
     try {
         getElasticityParameters(stiffness, damping);
-        
+
         initialize();
         createContext();
         mainLoop();

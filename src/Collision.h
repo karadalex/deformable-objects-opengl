@@ -38,16 +38,6 @@ bool checkForPlaneSphereCollision(glm::vec3& pos, const float& r, const float& s
 void handlePlaneCubeCollision(Plane& plane, Cube& cube);
 
 /**
- * @brief checkForPlaneCubeCollision
- * @param pos
- * @param l
- * @param size
- * @param n
- * @return
- */
-bool checkForPlaneCubeCollision(glm::vec3& pos, const float& l, const float& size, glm::vec3& n);
-
-/**
  * @brief handlePlaneModelCollision
  * @param plane
  * @param model

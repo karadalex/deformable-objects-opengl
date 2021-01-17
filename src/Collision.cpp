@@ -31,30 +31,14 @@ bool checkForPlaneSphereCollision(vec3& pos, const float& r, const float& size, 
 
 
 void handlePlaneCubeCollision(Plane& plane, Cube& cube) {
-    for (int i = 0; i < cube.cube->particleSystem.size(); i++) {
+    for (int i = 0; i < cube.particleSystem.size(); i++) {
         vec3 n;
-        if (checkForPlaneParticleCollision(cube.cube->particleSystem.at(i)->x, n)) {
+        if (checkForPlaneParticleCollision(cube.particleSystem.at(i)->x, n)) {
             // Define the velocity of the cube after the collision
-            cube.cube->particleSystem.at(i)->v = cube.cube->particleSystem.at(i)->v - 2.0f * dot(cube.cube->particleSystem.at(i)->v, n) * n;
-            cube.cube->particleSystem.at(i)->P = cube.cube->particleSystem.at(i)->v * cube.cube->particleSystem.at(i)->m;
+            cube.particleSystem.at(i)->v = (cube.particleSystem.at(i)->v - 2.0f * dot(cube.particleSystem.at(i)->v, n) * n) * (1.0f/(float)cube.particlesNum);
+            cube.particleSystem.at(i)->P = cube.particleSystem.at(i)->v * cube.particleSystem.at(i)->m * (1.0f/(float)cube.particlesNum);
         }
-    }
-    
-}
-
-
-bool checkForPlaneCubeCollision(vec3& pos, const float& l, const float& size, vec3& n) {
-    bool insideXZ = true; // TODO: Check if cube is inside XZ plane
-    if (pos.y - l/2 <= 0 && insideXZ) {
-        //correction
-        float dis = -(pos.y - l/2);
-        pos = pos + vec3(0, dis, 0);
-
-        n = vec3(0, -1, 0);
-    } else {
-        return false;
-    }
-    return true;
+    }  
 }
 
 
@@ -98,12 +82,12 @@ bool checkForPlaneParticleCollision(vec3& particle_pos, vec3& n) {
 
 // TODO
 void handleStaircaseCubeCollision(Staircase& staircase, Cube& cube) {
-    for (int i = 0; i < cube.cube->particleSystem.size(); i++) {
+    for (int i = 0; i < cube.particleSystem.size(); i++) {
         vec3 n;
-        if (checkForStaircaseParticleCollision(staircase, cube.cube->particleSystem.at(i)->x, n)) {
+        if (checkForStaircaseParticleCollision(staircase, cube.particleSystem.at(i)->x, n)) {
             // Define the velocity of the cube after the collision
-            cube.cube->particleSystem.at(i)->v = cube.cube->particleSystem.at(i)->v - 2.0f * dot(cube.cube->particleSystem.at(i)->v, n) * n;
-            cube.cube->particleSystem.at(i)->P = cube.cube->particleSystem.at(i)->v * cube.cube->particleSystem.at(i)->m;
+            cube.particleSystem.at(i)->v = cube.particleSystem.at(i)->v - 2.0f * dot(cube.particleSystem.at(i)->v, n) * n;
+            cube.particleSystem.at(i)->P = cube.particleSystem.at(i)->v * cube.particleSystem.at(i)->m;
         }
     }
 }

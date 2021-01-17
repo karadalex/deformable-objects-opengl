@@ -79,7 +79,7 @@ void createContext() {
     staircase = new Staircase(2);
     float length = 1; 
     float mass = 10;
-    cube = new Cube(vec3(0, 10, -5), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
+    cube = new Cube(vec3(0, 10, -5), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
 
     freeForm = new FreeForm(vec3(0, 10, -5), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
 }
@@ -129,8 +129,7 @@ void mainLoop() {
             cube->update(t, dt);   
             freeForm->update(t, dt);
         }
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
-        // cube->draw(showModelVertices);
+        cube->draw();
 
         freeForm->draw();
 

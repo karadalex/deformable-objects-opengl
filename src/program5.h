@@ -77,9 +77,8 @@ void createContext() {
 
     plane = new Plane(8);
     staircase = new Staircase(1);
-    float length = 1; 
     float mass = 10;
-    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), length, mass, stiffness, damping);
+    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
 
     freeForm = new FreeForm(vec3(4, 5, 4), vec3(0, -2, 0), vec3(0, 0, 0), mass, stiffness, damping);
 }
@@ -129,10 +128,9 @@ void mainLoop() {
             cube->update(t, dt);   
             freeForm->update(t, dt);
         }
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &cube->modelMatrix[0][0]);
-        // cube->draw(showModelVertices);
+        cube->draw();
 
-        freeForm->draw();
+        // freeForm->draw();
 
         // Collision checks
         handlePlaneCubeCollision(*plane, *cube);

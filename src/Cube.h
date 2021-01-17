@@ -1,36 +1,37 @@
 #ifndef CUBE_H
 #define CUBE_H
 
-#include "RigidBody.h"
-#include "DeformableBody.h"
+#include "Grid3D.h"
+#include "Particle.h"
+#include <common/model.h>
+#include <vector>
+#include <string>
+#include <iostream>
+#include <common/util.h>
 
-class DeformableBody;
+using namespace std;
+using namespace glm;
 
-class Cube : public RigidBody {
+// Standard acceleration due to gravity
+#define g 9.80665f
+
+class Cube {
 public:
-    DeformableBody* cube;
-    float l;
-    glm::mat4 modelMatrix;
+    GLuint VAO, VBO, EBO;
+    vector<vec3> vertices;
+    vector<uvec4> indices;
 
-    /**
-     * @brief Cube
-     * @param pos
-     * @param vel
-     * @param omega
-     * @param length
-     * @param mass
-     * @param stiffness
-     * @param damping
-     */
-    Cube(glm::vec3 pos, glm::vec3 vel, glm::vec3 omega, float length, float mass, float stiffness, float damping);
+    std::vector<Particle*> particleSystem; 
+    int particlesNum;   
+    float k0 = 0.5; // stiffness
+    float b = 0.01; // damping
 
-    ~Cube();
+    Cube(vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
 
-    /**
-     * @brief draw
-     * @param showCubeVertices
-     */
-    void draw(bool showCubeVertices = false);
+    void createContext();
+
+    /* Bind VAO before calling draw */
+    void draw(int mode = GL_TRIANGLES);
 
     /**
      * @brief update
@@ -38,6 +39,8 @@ public:
      * @param dt
      */
     void update(float t = 0, float dt = 0);
+
+    ~Cube();
 };
 
 #endif
