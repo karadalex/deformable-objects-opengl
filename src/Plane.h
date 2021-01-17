@@ -25,12 +25,13 @@ public:
      * @brief draw
      * @param drawable
      */
+    void draw(unsigned int drawable = 0);
 
     /**
-     * @brief draw
-     * @param drawable
+     * @brief update
+     * @param t
+     * @param dt
      */
-    void draw(unsigned int drawable = 0);
     void update(float t = 0, float dt = 0);
 };
 

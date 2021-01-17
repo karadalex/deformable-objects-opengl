@@ -5,9 +5,6 @@
 
 class Drawable;
 
-/**
- * Represents the bounding box
- */
 class Staircase {
 public:
     Drawable* staircase;
@@ -21,7 +18,17 @@ public:
     Staircase(float s = 1.0f);
     ~Staircase();
 
+    /**
+     * @brief draw
+     * @param drawable
+     */
     void draw(unsigned int drawable = 0);
+
+    /**
+     * @brief update
+     * @param t
+     * @param dt
+     */
     void update(float t = 0, float dt = 0);
 };
 

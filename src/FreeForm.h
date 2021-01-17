@@ -26,11 +26,22 @@ public:
     float k0 = 0.5; // stiffness
     float b = 0.01; // damping
 
+    /**
+     * @brief FreeForm
+     * @param position
+     * @param vel
+     * @param omega
+     * @param mass
+     * @param stiffness
+     * @param damping
+     */
     FreeForm(vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
 
-    void createContext();
-
     /* Bind VAO before calling draw */
+    /**
+     * @brief draw
+     * @param mode
+     */
     void draw(int mode = GL_TRIANGLES);
 
     /**

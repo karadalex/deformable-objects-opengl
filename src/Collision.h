@@ -45,6 +45,12 @@ void handlePlaneCubeCollision(Plane& plane, Cube& cube);
  */
 bool handlePlaneModelCollision(Plane& plane, DeformableModel& model);
 
+/**
+ * @brief handlePlaneFreeFormCollision
+ * @param plane
+ * @param model
+ * @return
+ */
 bool handlePlaneFreeFormCollision(Plane& plane, FreeForm& model);
 
 /**
@@ -80,6 +86,11 @@ bool checkForSphereSphereCollision(glm::vec3& pos1, float& r1, glm::vec3& pos2, 
  */
 void handleStaircaseCubeCollision(Staircase& staircase, Cube& cube);
 
+/**
+ * @brief handleStaircaseFreeFormCollision
+ * @param staircase
+ * @param model
+ */
 void handleStaircaseFreeFormCollision(Staircase& staircase, FreeForm& model) ;
 
 /**
