@@ -20,6 +20,8 @@ public:
     GLuint VAO, VBO, EBO;
     vector<vec3> vertices;
     vector<uvec4> indices;
+    Drawable* drawable;
+    glm::mat4 modelMatrix;
 
     std::vector<Particle*> particleSystem; 
     int particlesNum;   
@@ -28,6 +30,7 @@ public:
 
     /**
      * @brief FreeForm
+     * @param modelFile
      * @param position
      * @param vel
      * @param omega
@@ -35,7 +38,7 @@ public:
      * @param stiffness
      * @param damping
      */
-    FreeForm(vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
+    FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
 
     /* Bind VAO before calling draw */
     /**

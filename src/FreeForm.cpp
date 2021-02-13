@@ -1,7 +1,9 @@
 #include "FreeForm.h"
 
 
-FreeForm::FreeForm(vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping) {
+FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping) {
+  drawable = new Drawable(modelFile);
+
   k0 = stiffness;
   b = damping;
 
@@ -176,19 +178,28 @@ void FreeForm::update(float t, float dt) {
   for (int i = 0; i < vertices.size(); i++) {
     vertices.at(i) = particleSystem.at(i)->x;
   }
+
+  // Update model
+  vec3 x = particleSystem.at(0)->x;
+  mat4 translate = glm::translate(mat4(), vec3(x.x, x.y, x.z));
+  mat4 scale = mat4();
+  modelMatrix = translate * scale;
 }
 
 
 void FreeForm::draw(int mode) {
+  drawable->bind();
+  drawable->draw();
+  // glBindVertexArray(0);
+
   // Update Vertices with new positions
   glBindBuffer(GL_ARRAY_BUFFER, VBO);
   glBufferSubData(GL_ARRAY_BUFFER, 0, vertices.size() * sizeof(vec3), &vertices[0]);
 
   // Draw grid
-  glEnable(GL_DEPTH_TEST);
+  // glEnable(GL_DEPTH_TEST);
   glBindVertexArray(VAO);
   glDrawElements(GL_LINES, (GLuint)indices.size()*4, GL_UNSIGNED_INT, NULL);
   glBindVertexArray(0);
-  glDisable(GL_DEPTH_TEST);
-
+  // glDisable(GL_DEPTH_TEST);
 }

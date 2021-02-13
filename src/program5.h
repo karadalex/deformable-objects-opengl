@@ -43,12 +43,12 @@ GLFWwindow* window;
 Camera* camera;
 GLuint shaderProgram;
 GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
+string selectedModelFile;
 
 float stiffness, damping;
 
 // Scene objects
 Plane* plane;
-Cube* cube;
 Staircase* staircase;
 FreeForm* freeForm;
 
@@ -78,15 +78,15 @@ void createContext() {
     plane = new Plane(8);
     staircase = new Staircase(1);
     float mass = 10;
-    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
-
-    freeForm = new FreeForm(vec3(4, 5, 4), vec3(0, -2, 0), vec3(0, 0, 0), mass, stiffness, damping);
+    vec3 position = vec3(4, 5, 4);
+    vec3 velocity = vec3(0, -2, 0);
+    vec3 omega = vec3(0, 0, 0);
+    freeForm = new FreeForm(selectedModelFile, position, velocity, omega, mass, stiffness, damping);
 }
 
 void free() {
     delete plane;
     delete staircase;
-    delete cube;
     glDeleteProgram(shaderProgram);
     glfwTerminate();
 }
@@ -120,30 +120,18 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
 
-        staircase->update(t, dt);
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
+        // staircase->update(t, dt);
+        // glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
         // staircase->draw();
 
-        if (!pausePhysics) {
-            cube->update(t, dt);   
+        if (!pausePhysics) {   
             freeForm->update(t, dt);
         }
-        cube->draw();
-
-        // freeForm->draw();
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &freeForm->modelMatrix[0][0]);
+        freeForm->draw();
 
         // Collision checks
-        handlePlaneCubeCollision(*plane, *cube);
         handlePlaneFreeFormCollision(*plane, *freeForm);
-
-        // Calculate the total energy and comment on the previous
-        // float KE = cube->calcKinecticEnergy();
-		// float PE = cube->m * g * cube->x.y;
-        // float T = KE + PE;
-        // if (T > maxEnergy) {
-        //     cout << "Total Energy: " << T << endl;
-        //     maxEnergy = T;
-        // }
 
         t += dt;
 
@@ -224,6 +212,7 @@ void initialize() {
 
 int main(int argc, char* argv[]) {
     try {
+        selectedModelFile = "models/" + selectObject();
         getElasticityParameters(stiffness, damping);
 
         initialize();
