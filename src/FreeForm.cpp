@@ -3,14 +3,32 @@
 
 FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping) {
   drawable = new Drawable(modelFile);
-
+  
+  pos = position;
   k0 = stiffness;
   b = damping;
 
+  // Calculate AABB of drawable object
+	aabb.min_x = aabb.max_x = drawable->vertices[0].x;
+	aabb.min_y = aabb.max_y = drawable->vertices[0].y;
+	aabb.min_z = aabb.max_z = drawable->vertices[0].z;
+
+	for (int i = 0; i < drawable->vertices.size(); i++) {
+    vec3 vertex = drawable->vertices.at(i);
+		if (vertex.x < aabb.min_x) aabb.min_x = vertex.x;
+		if (vertex.y < aabb.min_y) aabb.min_y = vertex.y;
+		if (vertex.z < aabb.min_z) aabb.min_z = vertex.z;
+
+		if (vertex.x > aabb.max_x) aabb.max_x = vertex.x;
+		if (vertex.y > aabb.max_y) aabb.max_y = vertex.y;
+		if (vertex.z > aabb.max_z) aabb.max_z = vertex.z;
+	}
+  aabbCenterTranslation = vec3((aabb.max_x - aabb.min_x)/2.0f, (aabb.max_y - aabb.min_y)/2.0f, (aabb.max_z - aabb.min_z)/2.0f);
+
   Grid3DParams gridParams;
-  gridParams.width = 5.0f;
-  gridParams.height = 5.0f;
-  gridParams.depth = 5.0f;
+  gridParams.width = aabb.max_x - aabb.min_x;
+  gridParams.height = aabb.max_y - aabb.min_y;
+  gridParams.depth = aabb.max_z - aabb.min_z;
   gridParams.n = 5;
   gridParams.m = 5;
   gridParams.l = 5;
@@ -40,7 +58,7 @@ FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float 
   float particleMass = mass / particlesNum;
   // Assign a Particle to each vertex
   for (int i = 0; i < vertices.size(); i++) {
-    vec3 vertex = vertices.at(i);
+    vec3 vertex = vertices.at(i) - aabbCenterTranslation + vec3(0, 5, 0);
     Particle* particle = new Particle(vertex, vel, particleMass);
     particleSystem.push_back(particle);
   }
@@ -157,7 +175,8 @@ void FreeForm::update(float t, float dt) {
       damping += -b*vel;
     }
 
-    vec3 force = gravity + elastic + damping;
+    // vec3 force = gravity + elastic + damping;
+    vec3 force = elastic + damping;
     if (i == 0) {
       printVec3(gravity, "gravity");
       printVec3(elastic, "elastic");
@@ -178,19 +197,25 @@ void FreeForm::update(float t, float dt) {
   for (int i = 0; i < vertices.size(); i++) {
     vertices.at(i) = particleSystem.at(i)->x;
   }
-
-  // Update model
-  vec3 x = particleSystem.at(0)->x;
-  mat4 translate = glm::translate(mat4(), vec3(x.x, x.y, x.z));
-  mat4 scale = mat4();
-  modelMatrix = translate * scale;
 }
 
 
-void FreeForm::draw(int mode) {
+void FreeForm::draw(GLuint modelMatrixLocation, int mode) {
+  // Calculate modelMatrix transformation for the actual model separately from the
+  // grid, so that they are aligned
+  vec3 x = particleSystem.at(0)->x + aabbCenterTranslation;
+  mat4 translate = glm::translate(mat4(), vec3(x.x, x.y, x.z));
+  mat4 scale = mat4();
+  modelMatrix = translate * scale;
+  glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &modelMatrix[0][0]);
+
   drawable->bind();
   drawable->draw();
   // glBindVertexArray(0);
+
+  // Undo modelMatrix trnasformation
+  modelMatrix = mat4();
+  glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &modelMatrix[0][0]);
 
   // Update Vertices with new positions
   glBindBuffer(GL_ARRAY_BUFFER, VBO);

@@ -15,16 +15,23 @@ using namespace glm;
 // Standard acceleration due to gravity
 #define g 9.80665f
 
+struct AABB {
+  double min_x, min_y, min_z, max_x, max_y, max_z;
+};
+
 class FreeForm {
 public:
     GLuint VAO, VBO, EBO;
     vector<vec3> vertices;
     vector<uvec4> indices;
     Drawable* drawable;
-    glm::mat4 modelMatrix;
+    glm::mat4 modelMatrix = mat4();
+    AABB aabb;
+    vec3 aabbCenterTranslation;
 
     std::vector<Particle*> particleSystem; 
-    int particlesNum;   
+    int particlesNum;  
+    vec3 pos; 
     float k0 = 0.5; // stiffness
     float b = 0.01; // damping
 
@@ -45,7 +52,7 @@ public:
      * @brief draw
      * @param mode
      */
-    void draw(int mode = GL_TRIANGLES);
+    void draw(GLuint modelMatrixLocation, int mode = GL_TRIANGLES);
 
     /**
      * @brief update

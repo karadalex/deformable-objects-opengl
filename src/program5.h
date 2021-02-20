@@ -78,7 +78,7 @@ void createContext() {
     plane = new Plane(8);
     staircase = new Staircase(1);
     float mass = 10;
-    vec3 position = vec3(4, 5, 4);
+    vec3 position = vec3(4, 10, 4);
     vec3 velocity = vec3(0, -2, 0);
     vec3 omega = vec3(0, 0, 0);
     freeForm = new FreeForm(selectedModelFile, position, velocity, omega, mass, stiffness, damping);
@@ -127,8 +127,7 @@ void mainLoop() {
         if (!pausePhysics) {   
             freeForm->update(t, dt);
         }
-        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &freeForm->modelMatrix[0][0]);
-        freeForm->draw();
+        freeForm->draw(modelMatrixLocation);
 
         // Collision checks
         handlePlaneFreeFormCollision(*plane, *freeForm);
@@ -212,8 +211,11 @@ void initialize() {
 
 int main(int argc, char* argv[]) {
     try {
-        selectedModelFile = "models/" + selectObject();
-        getElasticityParameters(stiffness, damping);
+        // selectedModelFile = "models/" + selectObject();
+        // getElasticityParameters(stiffness, damping);
+        selectedModelFile = "models/armadillo_low_low.obj";
+        stiffness = 0.5f;
+        damping = 0.1f;
 
         initialize();
         createContext();
