@@ -56,7 +56,8 @@ Staircase* staircase;
 // Simulation toggles
 bool showModelVertices = false;
 bool pausePhysics = false;
-bool mouseClicked = false;
+bool rightMouseClicked = false;
+bool leftMouseClicked = false;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_V && action == GLFW_PRESS) {
@@ -72,12 +73,25 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
         // Reset cube to original mode and start dragging it with mouse
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 10, stiffness, damping);
-        mouseClicked = true;
+        rightMouseClicked = true;
         pausePhysics = true;
     }
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
         // Stop dragging with the mouse on releasing the right mouse button
-        mouseClicked = false;
+        rightMouseClicked = false;
+        pausePhysics = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        // Reset cube to original mode and start dragging it with mouse
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        leftMouseClicked = true;
+        pausePhysics = true;
+    }
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        // Stop dragging with the mouse on releasing the right mouse button
+        leftMouseClicked = false;
         pausePhysics = false;
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
@@ -125,14 +139,22 @@ void mainLoop() {
         glUseProgram(shaderProgram);
 
         // camera
-        if (!mouseClicked) {
+        if (!leftMouseClicked && !rightMouseClicked) {
             camera->update();
         } else {
             double xPos, yPos;
             glfwGetCursorPos(window, &xPos, &yPos);
             int width, height;
             glfwGetWindowSize(window, &width, &height);
-            cube->translateAllVertices(vec3(-float(width / 2 - xPos)/100, float(height / 2 - yPos)/100, 0));
+            vec3 displacement = vec3(-float(width / 2 - xPos)/100, float(height / 2 - yPos)/100, 0);
+
+            if (rightMouseClicked) {
+                cube->translateAllVertices(displacement);
+            }
+            else {
+                cube->particleSystem.at(0)->x += displacement;
+                cube->vertices.at(0) += displacement;
+            }
             glfwSetCursorPos(window, width / 2, height / 2);
         }
         mat4 projectionMatrix = camera->projectionMatrix;
