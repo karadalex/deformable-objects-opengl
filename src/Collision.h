@@ -43,7 +43,7 @@ void handlePlaneCubeCollision(Plane& plane, Cube& cube);
  * @param model
  * @return
  */
-bool handlePlaneModelCollision(Plane& plane, DeformableModel& model);
+void handlePlaneModelCollision(Plane& plane, DeformableModel& model);
 
 /**
  * @brief handlePlaneFreeFormCollision
@@ -51,7 +51,7 @@ bool handlePlaneModelCollision(Plane& plane, DeformableModel& model);
  * @param model
  * @return
  */
-bool handlePlaneFreeFormCollision(Plane& plane, FreeForm& model);
+void handlePlaneFreeFormCollision(Plane& plane, FreeForm& model);
 
 /**
  * @brief checkForPlaneParticleCollision

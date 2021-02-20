@@ -148,7 +148,18 @@ SOURCE_GROUP(obj REGULAR_EXPRESSION ".*/.*obj$" )
 
 ###############################################################################
 # copy
-if (NOT ${CMAKE_GENERATOR} MATCHES "Xcode" )
+if (NOT ${CMAKE_GENERATOR} MATCHES "Xcode" AND ${CMAKE_GENERATOR} MATCHES "Visual Studio")
+  message(STATUS "Building from Visual Studio")
+
+  add_custom_command(
+    TARGET deformable POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy 
+            ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/deformable${CMAKE_EXECUTABLE_SUFFIX} 
+            ${CMAKE_CURRENT_SOURCE_DIR}/src/)
+
+elseif (NOT ${CMAKE_GENERATOR} MATCHES "Xcode" AND NOT ${CMAKE_GENERATOR} MATCHES "Visual Studio")
+
+  message(STATUS "Building from outside of Visual Studio and Xcode")
 
   add_custom_command(
     TARGET deformable POST_BUILD

@@ -42,7 +42,7 @@ void handlePlaneCubeCollision(Plane& plane, Cube& cube) {
 }
 
 
-bool handlePlaneModelCollision(Plane& plane, DeformableModel& model) {
+void handlePlaneModelCollision(Plane& plane, DeformableModel& model) {
     for (int i = 0; i < model.model->particleSystem.size(); i++) {
         vec3 n;
         if (checkForPlaneParticleCollision(model.model->particleSystem.at(i)->x, n)) {
@@ -54,7 +54,7 @@ bool handlePlaneModelCollision(Plane& plane, DeformableModel& model) {
 }
 
 
-bool handlePlaneFreeFormCollision(Plane& plane, FreeForm& model) {
+void handlePlaneFreeFormCollision(Plane& plane, FreeForm& model) {
     for (int i = 0; i < model.particleSystem.size(); i++) {
         vec3 n;
         if (checkForPlaneParticleCollision(model.particleSystem.at(i)->x, n)) {
