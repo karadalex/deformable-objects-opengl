@@ -69,4 +69,13 @@ std::string selectModelTexture();
 
 void printVec3(glm::vec3 v, const char *name = "Vector");
 
+template<typename T>
+void printStdVector(std::vector<T> v, const char *name = "Vector") {
+    std::cout << name << " = ";
+    for (int i = 0; i < v.size(); i++) {
+        std::cout << v.at(i) << ", ";
+    }
+    std::cout << std::endl;
+}
+
 #endif
