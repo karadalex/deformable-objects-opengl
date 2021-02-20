@@ -22,7 +22,7 @@ struct AABB {
 class FreeForm {
 public:
     GLuint VAO, VBO, EBO;
-    vector<vec3> vertices, prevVertices;
+    vector<vec3> vertices, prevVertices, translations;
     vector<uvec4> indices;
     Drawable* drawable;
     glm::mat4 modelMatrix = mat4();

@@ -9,12 +9,12 @@ FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float 
   b = damping;
 
   // Calculate AABB of drawable object
-	aabb.min_x = aabb.max_x = drawable->vertices[0].x;
-	aabb.min_y = aabb.max_y = drawable->vertices[0].y;
-	aabb.min_z = aabb.max_z = drawable->vertices[0].z;
+	aabb.min_x = aabb.max_x = drawable->indexedVertices[0].x;
+	aabb.min_y = aabb.max_y = drawable->indexedVertices[0].y;
+	aabb.min_z = aabb.max_z = drawable->indexedVertices[0].z;
 
-	for (int i = 0; i < drawable->vertices.size(); i++) {
-    vec3 vertex = drawable->vertices.at(i);
+	for (int i = 0; i < drawable->indexedVertices.size(); i++) {
+    vec3 vertex = drawable->indexedVertices.at(i);
 		if (vertex.x < aabb.min_x) aabb.min_x = vertex.x;
 		if (vertex.y < aabb.min_y) aabb.min_y = vertex.y;
 		if (vertex.z < aabb.min_z) aabb.min_z = vertex.z;
@@ -34,7 +34,11 @@ FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float 
   gridParams.l = 5;
   gridParams.position = position;
   Grid3D* grid = new Grid3D(gridParams);
-  for (vec3 v : grid->vertices) vertices.push_back(v);
+  for (vec3 v : grid->vertices) {
+    vertices.push_back(v);
+    prevVertices.push_back(v);
+  }
+  translations = vector<vec3>(vertices.size(), vec3(0,0,0));
   for (uvec4 ind : grid->indices) indices.push_back(ind);
 
   glGenVertexArrays(1, &VAO);
@@ -132,8 +136,8 @@ FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float 
 
 
 void FreeForm::mapModelVerticesToControlPoints() {
-  for (int i = 0; i < drawable->vertices.size(); i++) {
-    vec3 modelVertex = drawable->vertices.at(i);
+  for (int i = 0; i < drawable->indexedVertices.size(); i++) {
+    vec3 modelVertex = drawable->indexedVertices.at(i);
     float minDist = length(modelVertex - vertices.at(0));
     // the index of the grid vertex that is closest to the model vertex
     int minDistInd = 0;
@@ -215,9 +219,18 @@ void FreeForm::update(float t, float dt) {
   }
 
   // Get new position of particle and save it in the vertex
+  // and save previous value as well as the displacement
   for (int i = 0; i < vertices.size(); i++) {
+    prevVertices.at(i) = vertices.at(i);
     vertices.at(i) = particleSystem.at(i)->x;
+    translations.at(i) = vertices.at(i) - prevVertices.at(i);
   }
+
+  // Update model vertices positions based on translations of the grid vertices
+  for (int i = 0; i < drawable->indexedVertices.size(); i++) {
+    drawable->indexedVertices.at(i) += translations.at(modelVerticesToControlPts.at(i));
+  }
+  
 }
 
 
@@ -230,6 +243,8 @@ void FreeForm::draw(GLuint modelMatrixLocation, int mode) {
   modelMatrix = translate * scale;
   glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &modelMatrix[0][0]);
 
+  glBindBuffer(GL_ARRAY_BUFFER, drawable->verticesVBO);
+  glBufferSubData(GL_ARRAY_BUFFER, 0, drawable->indexedVertices.size() * sizeof(vec3), &drawable->indexedVertices[0]);
   drawable->bind();
   drawable->draw();
   // glBindVertexArray(0);
