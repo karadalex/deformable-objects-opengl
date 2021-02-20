@@ -50,6 +50,8 @@ public:
      */
     void update(float t = 0, float dt = 0);
 
+    void translateAllVertices(vec3 translation);
+
     ~Cube();
 };
 

@@ -56,6 +56,7 @@ Staircase* staircase;
 // Simulation toggles
 bool showModelVertices = false;
 bool pausePhysics = false;
+bool mouseClicked = false;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_V && action == GLFW_PRESS) {
@@ -65,6 +66,23 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         pausePhysics = !pausePhysics;
     }
 }
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        // Reset cube to original mode and start dragging it with mouse
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), 10, stiffness, damping);
+        mouseClicked = true;
+        pausePhysics = true;
+    }
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+        // Stop dragging with the mouse on releasing the right mouse button
+        mouseClicked = false;
+        pausePhysics = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+}
+
 
 void createContext() {
     shaderProgram = loadShaders("shaders/deformable.vert", "shaders/deformable.frag");
@@ -107,7 +125,16 @@ void mainLoop() {
         glUseProgram(shaderProgram);
 
         // camera
-        camera->update();
+        if (!mouseClicked) {
+            camera->update();
+        } else {
+            double xPos, yPos;
+            glfwGetCursorPos(window, &xPos, &yPos);
+            int width, height;
+            glfwGetWindowSize(window, &width, &height);
+            cube->translateAllVertices(vec3(-float(width / 2 - xPos)/100, float(height / 2 - yPos)/100, 0));
+            glfwSetCursorPos(window, width / 2, height / 2);
+        }
         mat4 projectionMatrix = camera->projectionMatrix;
         mat4 viewMatrix = camera->viewMatrix;
         glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
@@ -210,6 +237,7 @@ void initialize() {
 
     // Simulation toggles
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     // Create camera
     camera = new Camera(window);

@@ -120,6 +120,16 @@ Cube::Cube(vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, flo
   
 }
 
+
+void Cube::translateAllVertices(vec3 translation) {
+  for (int i = 0; i < vertices.size(); i++) {
+    Particle* prt = particleSystem.at(i);
+    prt->x += translation;
+    vertices.at(i) = particleSystem.at(i)->x;
+  }
+}
+
+
 void Cube::update(float t, float dt) {
   for (int i = 0; i < particlesNum; i++) {
     Particle* prt1 = particleSystem.at(i);
