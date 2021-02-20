@@ -58,7 +58,7 @@ FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float 
   float particleMass = mass / particlesNum;
   // Assign a Particle to each vertex
   for (int i = 0; i < vertices.size(); i++) {
-    vec3 vertex = vertices.at(i) - aabbCenterTranslation + vec3(0, 5, 0);
+    vec3 vertex = vertices.at(i);
     Particle* particle = new Particle(vertex, vel, particleMass);
     particleSystem.push_back(particle);
   }
@@ -123,8 +123,29 @@ FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float 
       }
     }
   }
-  
+
+  // Last step of pre-processing
+  // Map model vertices to the 4 nearest points
+  mapModelVerticesToControlPoints();
+  printStdVector(modelVerticesToControlPts, "modelVerticesToControlPts");
 }
+
+
+void FreeForm::mapModelVerticesToControlPoints() {
+  for (int i = 0; i < drawable->vertices.size(); i++) {
+    vec3 modelVertex = drawable->vertices.at(i);
+    float minDist = length(modelVertex - vertices.at(0));
+    // the index of the grid vertex that is closest to the model vertex
+    int minDistInd = 0;
+    for (int j = 1; j < vertices.size(); j++) {
+      vec3 gridVertex = vertices.at(j);
+      float dist = length(modelVertex - gridVertex);
+      if (dist < minDist) minDistInd = j;
+    }
+    modelVerticesToControlPts.push_back(minDistInd);
+  } 
+}
+
 
 void FreeForm::update(float t, float dt) {
   for (int i = 0; i < particlesNum; i++) {
@@ -203,7 +224,7 @@ void FreeForm::update(float t, float dt) {
 void FreeForm::draw(GLuint modelMatrixLocation, int mode) {
   // Calculate modelMatrix transformation for the actual model separately from the
   // grid, so that they are aligned
-  vec3 x = particleSystem.at(0)->x + aabbCenterTranslation;
+  vec3 x = 0.5f*(particleSystem.at(0)->x + particleSystem.at(particleSystem.size()-1)->x);
   mat4 translate = glm::translate(mat4(), vec3(x.x, x.y, x.z));
   mat4 scale = mat4();
   modelMatrix = translate * scale;

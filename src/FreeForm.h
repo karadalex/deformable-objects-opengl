@@ -22,7 +22,7 @@ struct AABB {
 class FreeForm {
 public:
     GLuint VAO, VBO, EBO;
-    vector<vec3> vertices;
+    vector<vec3> vertices, prevVertices;
     vector<uvec4> indices;
     Drawable* drawable;
     glm::mat4 modelMatrix = mat4();
@@ -47,9 +47,17 @@ public:
      */
     FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
 
-    /* Bind VAO before calling draw */
+    vector<int> modelVerticesToControlPts;
+
+    /**
+     * @brief mapModelVerticesToControlPoints
+     */
+    void mapModelVerticesToControlPoints();
+
+    /* Bind VAO before calling draw */    
     /**
      * @brief draw
+     * @param modelMatrixLocation
      * @param mode
      */
     void draw(GLuint modelMatrixLocation, int mode = GL_TRIANGLES);
