@@ -96,6 +96,7 @@ void createContext() {
     normalSampler = glGetUniformLocation(shaderProgram, "normalSampler");
 
     plane = new Plane(8);
+    staircase = new Staircase(2);
     float length = 0.1;
     vec3 pos = vec3(0, 5, 0);
     vec3 vel = vec3(0, -1, 0);
@@ -104,6 +105,7 @@ void createContext() {
 
 void free() {
     delete plane;
+    delete staircase;
     delete deformableModel;
     glDeleteProgram(shaderProgram);
     glfwTerminate();
@@ -138,7 +140,12 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
 
+        // staircase->update(t, dt);
+        // glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
+        // staircase->draw();
+
         handlePlaneModelCollision(*plane, *deformableModel);
+        // handleStaircaseCubeCollision(*staircase, *cube);
 
         if (!pausePhysics) {
             deformableModel->update(t, dt);   
