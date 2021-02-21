@@ -264,3 +264,24 @@ void FreeForm::draw(GLuint modelMatrixLocation, int mode) {
   glBindVertexArray(0);
   // glDisable(GL_DEPTH_TEST);
 }
+
+
+void FreeForm::translateAllVertices(vec3 translation) {
+  for (int i = 0; i < vertices.size(); i++) 
+    vertices.at(i) += translation;
+  for (int i = 0; i < drawable->indexedVertices.size(); i++) 
+    drawable->indexedVertices.at(i) += translation;
+}
+
+
+void FreeForm::transformWithControlPoint(int controlPtIndex, vec3 translation) {
+  particleSystem.at(controlPtIndex)->x += translation;
+  vertices.at(controlPtIndex) += translation;
+
+  // Update model vertices that are controlled by the given control point
+  for (int i = 0; i < drawable->indexedVertices.size(); i++) {
+    if (modelVerticesToControlPts.at(i) == controlPtIndex) {
+      drawable->indexedVertices.at(i) += translation;
+    }
+  }
+}

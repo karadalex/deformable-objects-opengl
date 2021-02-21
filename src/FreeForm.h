@@ -30,6 +30,7 @@ public:
     vec3 aabbCenterTranslation;
 
     std::vector<Particle*> particleSystem; 
+    vector<int> modelVerticesToControlPts;
     int particlesNum;  
     vec3 pos; 
     float k0 = 0.5; // stiffness
@@ -47,8 +48,6 @@ public:
      */
     FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float mass, float stiffness, float damping);
 
-    vector<int> modelVerticesToControlPts;
-
     /**
      * @brief mapModelVerticesToControlPoints
      */
@@ -61,6 +60,21 @@ public:
      * @param mode
      */
     void draw(GLuint modelMatrixLocation, int mode = GL_TRIANGLES);
+
+    /**
+     * @brief translateAllVertices: Translate all control points and model vertices by given amount of translation
+     * @param translation : A 3D vector with the amount of displacement/translation we want to apply all
+     * the control points and model vertices
+     */
+    void translateAllVertices(vec3 translation);
+
+    /**
+     * @brief transformWithControlPoint
+     * @param controlPtIndex : The index of the control point that will be moved
+     * @param translation : A 3D vector with the amount of displacement/translation we want to apply to the
+     * control point and thus to the controlled model vertices
+     */
+    void transformWithControlPoint(int controlPtIndex, vec3 translation);
 
     /**
      * @brief update

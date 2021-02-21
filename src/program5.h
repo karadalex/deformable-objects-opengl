@@ -46,6 +46,10 @@ GLuint projectionMatrixLocation, viewMatrixLocation, modelMatrixLocation;
 string selectedModelFile;
 
 float stiffness, damping;
+vec3 position = vec3(0, 10, 0);
+vec3 velocity = vec3(0, -2, 0);
+vec3 omega = vec3(0, 0, 0);
+float mass = 10;
 
 // Scene objects
 Plane* plane;
@@ -58,6 +62,8 @@ FreeForm* freeForm;
 // Simulation toggles
 bool showModelVertices = false;
 bool pausePhysics = false;
+bool rightMouseClicked = false;
+bool leftMouseClicked = false;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_V && action == GLFW_PRESS) {
@@ -65,6 +71,35 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
     }
     if (key == GLFW_KEY_P && action == GLFW_PRESS) {
         pausePhysics = !pausePhysics;
+    }
+}
+
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
+        // Reset cube to original mode and start dragging it with mouse
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        freeForm = new FreeForm(selectedModelFile, position, velocity, omega, mass, stiffness, damping);
+        rightMouseClicked = true;
+        pausePhysics = true;
+    }
+    if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE) {
+        // Stop dragging with the mouse on releasing the right mouse button
+        rightMouseClicked = false;
+        pausePhysics = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    }
+
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
+        // Reset cube to original mode and start dragging it with mouse
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        leftMouseClicked = true;
+        pausePhysics = true;
+    }
+    if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+        // Stop dragging with the mouse on releasing the right mouse button
+        leftMouseClicked = false;
+        pausePhysics = false;
+        glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 }
 
@@ -77,10 +112,6 @@ void createContext() {
 
     plane = new Plane(8);
     staircase = new Staircase(1);
-    float mass = 10;
-    vec3 position = vec3(0, 10, 0);
-    vec3 velocity = vec3(0, -2, 0);
-    vec3 omega = vec3(0, 0, 0);
     freeForm = new FreeForm(selectedModelFile, position, velocity, omega, mass, stiffness, damping);
 }
 
@@ -110,7 +141,23 @@ void mainLoop() {
         glUseProgram(shaderProgram);
 
         // camera
-        camera->update();
+        if (!leftMouseClicked && !rightMouseClicked) {
+            camera->update();
+        } else {
+            double xPos, yPos;
+            glfwGetCursorPos(window, &xPos, &yPos);
+            int width, height;
+            glfwGetWindowSize(window, &width, &height);
+            vec3 displacement = vec3(-float(width / 2 - xPos)/100, float(height / 2 - yPos)/100, 0);
+
+            if (rightMouseClicked) {
+                freeForm->translateAllVertices(displacement);
+            }
+            else {
+                freeForm->transformWithControlPoint(0, displacement);
+            }
+            glfwSetCursorPos(window, width / 2, height / 2);
+        }
         mat4 projectionMatrix = camera->projectionMatrix;
         mat4 viewMatrix = camera->viewMatrix;
         glUniformMatrix4fv(viewMatrixLocation, 1, GL_FALSE, &viewMatrix[0][0]);
@@ -204,6 +251,7 @@ void initialize() {
 
     // Simulation toggles
     glfwSetKeyCallback(window, key_callback);
+    glfwSetMouseButtonCallback(window, mouse_button_callback);
 
     // Create camera
     camera = new Camera(window);
