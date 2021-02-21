@@ -26,9 +26,9 @@ FreeForm::FreeForm(string modelFile, vec3 position, vec3 vel, vec3 omega, float 
   aabbCenterTranslation = vec3((aabb.max_x - aabb.min_x)/2.0f, (aabb.max_y - aabb.min_y)/2.0f, (aabb.max_z - aabb.min_z)/2.0f);
 
   Grid3DParams gridParams;
-  gridParams.width = aabb.max_x - aabb.min_x;
-  gridParams.height = aabb.max_y - aabb.min_y;
-  gridParams.depth = aabb.max_z - aabb.min_z;
+  gridParams.width = 1.1f*(aabb.max_x - aabb.min_x);
+  gridParams.height = 1.3f*(aabb.max_y - aabb.min_y);
+  gridParams.depth = 1.1f*(aabb.max_z - aabb.min_z);
   gridParams.n = 5;
   gridParams.m = 5;
   gridParams.l = 5;
