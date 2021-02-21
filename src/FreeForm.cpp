@@ -202,11 +202,11 @@ void FreeForm::update(float t, float dt) {
 
     // vec3 force = gravity + elastic + damping;
     vec3 force = elastic + damping;
-    if (i == 0) {
-      printVec3(gravity, "gravity");
-      printVec3(elastic, "elastic");
-      // printVec3(damping, "damping");
-    }
+    // if (i == 0) {
+    //   printVec3(gravity, "gravity");
+    //   printVec3(elastic, "elastic");
+    //   printVec3(damping, "damping");
+    // }
     prt1->forcing = [&](float t, const vector<float>& y)->vector<float> {
       vector<float> f(6, 0.0f);
       f[0] = force.x;

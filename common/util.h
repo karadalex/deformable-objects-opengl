@@ -4,6 +4,15 @@
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
+#include <time.h> 
+#include <chrono>
+
+typedef std::chrono::steady_clock::time_point time_point;
+typedef std::chrono::microseconds nanos;
+typedef std::chrono::microseconds micros;
+typedef std::chrono::milliseconds millis;
+typedef std::chrono::seconds secs;
+typedef std::chrono::steady_clock steady_clock;
 
 /* We can use a function like this to print some GL capabilities of our adapter
 to the log file. handy if we want to debug problems on other people's computers

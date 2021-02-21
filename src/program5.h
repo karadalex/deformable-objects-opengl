@@ -128,7 +128,14 @@ void mainLoop() {
     camera->position = glm::vec3(0, 8, 30);
     float maxEnergy = 0;
 
+    time_point start_time, stop_time;
+    long millis_duration = 0;
+    const int num_of_timing_frames = 500;
+    int timing_frame_count = 0;
+
     do {
+        start_time = steady_clock::now();
+
         // calculate dt
         float currentTime = glfwGetTime();
         float dt = currentTime - t;
@@ -184,8 +191,20 @@ void mainLoop() {
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        stop_time = steady_clock::now();
+        if (timing_frame_count < num_of_timing_frames) {
+            millis_duration += std::chrono::duration_cast<millis>(stop_time - start_time).count();
+            timing_frame_count++;
+
+        } else {
+             cout << "millis_duration is calculated " << endl;
+        }
+
     } while (glfwGetKey(window, GLFW_KEY_ESCAPE) != GLFW_PRESS &&
              glfwWindowShouldClose(window) == 0);
+
+    cout << "average_millis_duration = " << (float)millis_duration/(float)num_of_timing_frames << "ms" << endl;
 }
 
 void initialize() {

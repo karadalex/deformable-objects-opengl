@@ -111,14 +111,14 @@ bool checkForStaircaseParticleCollision(Staircase& staircase, vec3& p, vec3& n) 
         vec3 st_v = staircase.staircase->indexedVertices.at(i);
         if (p.y <= st_v.y && abs(p.x - st_v.x) <= 2.0f && abs(p.z - st_v.z) <= 2.0f ) {
             //correction
-            cout << "staircase collision" << endl;
+            // cout << "staircase collision" << endl;
             float dis = st_v.y - p.y;
             p += vec3(0, dis, 0);
             n = vec3(0, 1, 0.01);
             return true;
         }
     }
-    cout << "no staircase collision" << endl;
+    // cout << "no staircase collision" << endl;
 
     return false;
 }
