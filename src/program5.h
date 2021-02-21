@@ -111,7 +111,7 @@ void createContext() {
     modelMatrixLocation = glGetUniformLocation(shaderProgram, "M");
 
     plane = new Plane(8);
-    staircase = new Staircase(1);
+    staircase = new Staircase(2);
     freeForm = new FreeForm(selectedModelFile, position, velocity, omega, mass, stiffness, damping);
 }
 
@@ -167,9 +167,9 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
 
-        // staircase->update(t, dt);
-        // glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
-        // staircase->draw();
+        staircase->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
+        staircase->draw();
 
         if (!pausePhysics) {   
             freeForm->update(t, dt);
@@ -178,6 +178,7 @@ void mainLoop() {
 
         // Collision checks
         handlePlaneFreeFormCollision(*plane, *freeForm);
+        handleStaircaseFreeFormCollision(*staircase, *freeForm);
 
         t += dt;
 
