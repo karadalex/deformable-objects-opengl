@@ -77,7 +77,7 @@ void createContext() {
     plane = new Plane(8);
     staircase = new Staircase(1);
     float mass = 10;
-    cube = new Cube(vec3(4, 5, 4), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
+    cube = new Cube(vec3(4, 7, 4), vec3(0, -1, 0), vec3(0, 0, 0), mass, stiffness, damping);
 }
 
 void free() {
