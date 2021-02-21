@@ -223,7 +223,10 @@ void FreeForm::update(float t, float dt) {
   for (int i = 0; i < vertices.size(); i++) {
     prevVertices.at(i) = vertices.at(i);
     vertices.at(i) = particleSystem.at(i)->x;
-    translations.at(i) = vertices.at(i) - prevVertices.at(i);
+
+    float normalization = 1.0f/length(prevVertices.at(i));
+    float amplitude = 1.0f;
+    translations.at(i) = amplitude * normalization * (vertices.at(i) - prevVertices.at(i));
   }
 
   // Update model vertices positions based on translations of the grid vertices
