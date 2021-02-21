@@ -4,6 +4,7 @@
 #include "RigidBody.h"
 #include "Particle.h"
 #include <common/model.h>
+#include <common/util.h>
 #include <vector>
 #include <string>
 #include <iostream>
