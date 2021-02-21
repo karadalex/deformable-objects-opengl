@@ -140,12 +140,12 @@ void mainLoop() {
         glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &plane->modelMatrix[0][0]);
         plane->draw();
 
-        // staircase->update(t, dt);
-        // glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
-        // staircase->draw();
+        staircase->update(t, dt);
+        glUniformMatrix4fv(modelMatrixLocation, 1, GL_FALSE, &staircase->modelMatrix[0][0]);
+        staircase->draw();
 
         handlePlaneModelCollision(*plane, *deformableModel);
-        // handleStaircaseCubeCollision(*staircase, *cube);
+        handleStaircaseModelCollision(*staircase, *deformableModel);
 
         if (!pausePhysics) {
             deformableModel->update(t, dt);   

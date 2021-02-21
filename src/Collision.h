@@ -102,4 +102,6 @@ void handleStaircaseFreeFormCollision(Staircase& staircase, FreeForm& model) ;
  */
 bool checkForStaircaseParticleCollision(Staircase& staircase, vec3& p, vec3& n);
 
+void handleStaircaseModelCollision(Staircase& staircase, DeformableModel& model);
+
 #endif

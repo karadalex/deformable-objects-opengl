@@ -173,3 +173,15 @@ bool checkForParticleParticleCollision(vec3& pos, const float& r, const float& s
     }
     return true;
 }
+
+
+void handleStaircaseModelCollision(Staircase& staircase, DeformableModel& model) {
+    for (int i = 0; i < model.model->particleSystem.size(); i++) {
+        vec3 n;
+        if (checkForStaircaseParticleCollision(staircase, model.model->particleSystem.at(i)->x, n)) {
+            // Define the velocity of the model after the collision
+            model.model->particleSystem.at(i)->v = model.model->particleSystem.at(i)->v - 2.0f * dot(model.model->particleSystem.at(i)->v, n) * n;
+            model.model->particleSystem.at(i)->P = model.model->particleSystem.at(i)->v * model.model->particleSystem.at(i)->m;
+        }
+    }
+}
